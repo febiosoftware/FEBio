@@ -48,7 +48,7 @@ public:
 
 	public:
 		vec3d	m_vgap;		//!< gap function
-		vec3d	m_vgap0;	//!< initial gap function
+		vec3d	m_vgap0;	//!< initial gap (components in the current corotational frame of the primary surface)
 		vec3d	m_Lm;	//!< Lagrange multiplier
 		vec2d	m_rs;	//!< natural coordinates on secondary surface element
 		FEContactFrame	m_Rp;	//!< corotational frame at start of time step

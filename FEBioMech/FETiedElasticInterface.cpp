@@ -112,20 +112,30 @@ void TiedNodalPositions(FESurface& s, FESurfaceElement& el, bool prev, vec3d* y)
 
 // Kinematics of a tied integration point.
 // The contact forces derive from the potential (per unit reference area)
-//    Pi = lam.dg + eps/2 dg.dg,   dg = g - Rn.Gap,   lam = Rn.Lmd
-// where Rn is the corotational frame (FEContactFrame) of the primary surface at
-// the start of the time step. The initial gap and the multiplier are stored by
-// their components in this frame, so they rotate with the interface from one
-// time step to the next (frame invariance), while acting as dead vectors within
-// a time step (which keeps the tangent simple and the formulation stable).
+//    Pi = lam.dg + eps/2 dg.dg,   dg = g - R.Gap,   lam = R.Lmd
+// where R is the corotational frame (FEContactFrame) of the primary surface,
+// evaluated in the CURRENT configuration. The initial gap and the multiplier are
+// stored by their components in this frame, so they rotate exactly with the
+// interface (frame invariance). Note that evaluating R at the start of the time
+// step instead (i.e., treating R.Gap as a dead vector within a step) is not
+// objective: a rigid rotation increment dR over the step produces a spurious gap
+// dg = (dR - I).R_n.Gap, i.e. a spurious traction ~ eps*|dtheta|*|Gap| that
+// scales with the time step size.
+// Since R depends on the primary nodal positions, Pi also produces forces on the
+// primary nodes through R (see FETiedFrameOffset). These balance the moment of the
+// traction pair (+t at x1, -t at x2 = x1 + R.Gap), and make the formulation
+// variational: the tangent is the (symmetric) Hessian of Pi, which also keeps the
+// augmented Lagrangian iterations convergent.
 struct TiedKinematics
 {
-    FEContactFrame Rn;  // corotational frame at start of time step
+    FEContactFrame Rn;  // corotational frame in current configuration
     vec3d   gap;    // full gap x2 - x1
-    vec3d   dg;     // gap - Rn.Gap
-    vec3d   t;      // traction (per unit reference area) = Rn.Lmd + eps*dg
+    vec3d   dg;     // gap - R.Gap
+    vec3d   t;      // traction (per unit reference area) = R.Lmd + eps*dg
     double  J;      // current area Jacobian
     double  J0;     // reference area Jacobian (integration weight)
+    vec3d   a, b;   // covariant base vectors used to build the frame (incl. shell-bottom sign)
+    double  sgn;    // +1, or -1 for shell-bottom surfaces
 };
 
 void TiedEvalKinematics(FESurface& ss, FESurfaceElement& se, int j, FESurface& ms,
@@ -150,8 +160,11 @@ void TiedEvalKinematics(FESurface& ss, FESurfaceElement& se, int j, FESurface& m
     vec3d q(0, 0, 0);
     for (int i = 0; i < me.Nodes(); ++i) q += ym[i]*Hm[i];
 
-    // frame at start of time step
-    k.Rn.Evaluate(ss, se, j, true);
+    // corotational frame in the same configuration as the gap
+    // (same construction as FEContactFrame::Evaluate, incl. shell-bottom sign)
+    k.sgn = (ss.IsShellBottom() ? -1.0 : 1.0);
+    k.a = g1*k.sgn; k.b = g2*k.sgn;
+    k.Rn.Set(k.a, k.b);
 
     k.gap = q - r;
     k.dg  = k.gap - k.Rn.R(pt.m_Gap);
@@ -545,7 +558,7 @@ void FETiedElasticInterface::InitialProjection(FETiedElasticSurface& ss, FETiedE
                 // calculate the gap function and store its components
                 // in the corotational frame of the primary surface
                 FEContactFrame f;
-                f.Evaluate(ss, el, j, true);
+                f.Evaluate(ss, el, j, false);
                 pt.m_Gap = f.Rt(q - r);
 
 				contacts++;
@@ -601,7 +614,7 @@ void FETiedElasticInterface::ProjectSurface(FETiedElasticSurface& ss, FETiedElas
                 // rotated with the corotational frame (frame invariant)
                 vec3d g = q - r;
                 FEContactFrame f;
-                f.Evaluate(ss, el, j, true);
+                f.Evaluate(ss, el, j, false);
                 pt.m_dg = g - f.R(pt.m_Gap);
 				pt.m_gap = pt.m_dg.norm();
             }
@@ -707,11 +720,11 @@ void FETiedElasticInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
                 // robust with augmented Lagrangian than alpha-weighted force interpolation.
                 vec3d Jt = kn.t*kn.J0;
                 
-                // nodal forces
-                //   f1_a =  J0*N_a t
+                // nodal forces (minus the gradient of Pi = J0*psi, psi = lam.dg + eps/2 dg.dg)
+                //   f1_a =  J0*(N_a t - sum_k dG_k/dx_a d(psi)/dG_k)
                 //   f2_b = -J0*N_b t
-                // These are minus the gradient of the potential
-                //   Pi = J0*(lam.dg + eps/2 dg.dg)
+                // where the second term on the primary nodes comes from the dependence
+                // of the frame on the base vectors G_k (moment balance).
                 fe.assign(ndof, 0.0);
                 for (int k=0; k<nseln; ++k)
                 {
@@ -726,6 +739,20 @@ void FETiedElasticInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
                     fe[3*(k+nseln)  ] = f.x;
                     fe[3*(k+nseln)+1] = f.y;
                     fe[3*(k+nseln)+2] = f.z;
+                }
+                {
+                    FETiedFrameOffset fo;
+                    fo.EvalCorotational(kn.a, kn.b, pt.m_Gap, pt.m_Lmd, kn.gap, kn.dg, eps);
+                    double* Gr = se.Gr(j);
+                    double* Gs = se.Gs(j);
+                    for (int k=0; k<nseln; ++k)
+                    {
+                        double T[2] = { kn.sgn*Gr[k], kn.sgn*Gs[k] };
+                        vec3d f = fo.Force(T, kn.J0*w);
+                        fe[3*k  ] += f.x;
+                        fe[3*k+1] += f.y;
+                        fe[3*k+2] += f.z;
+                    }
                 }
                 
                 for (int k = 0; k < nseln; ++k) ss.m_Fn[se.m_lnode[k]] += vec3d(fe[3 * k], fe[3 * k + 1], fe[3 * k + 2]);
@@ -798,19 +825,21 @@ void FETiedElasticInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeInf
                 TiedEvalKinematics(ss, se, j, ms, pt, eps, false, k);
                 const double W = k.J0;      // integration weight (reference area)
                 
-                // Tangent T = d(f)/d(u) = -Hessian of Pi (symmetric), with
-                // f1_a = W*N_a*t, f2_b = -W*N_b*t and d(t)/d(u1_c) = -eps*N_c*I,
-                // d(t)/d(u2_d) = eps*N_d*I. FEBio stiffness ke = -w*T.
+                // The tangent is the Hessian of Pi = J0*psi(y, G) (symmetric), with
+                // y = x2 - x1 the gap vector and G = (g1, g2) the base vectors that define
+                // the corotational frame of the primary surface:
+                //   dy/dx1_a = -N_a I, dy/dx2_b = N_b I, dG_k/dx1_a = sgn*dN_a/dr_k I
                 ke.resize(ndof, ndof); ke.zero();
-                double c = w*W*eps;
-                for (int a=0; a<nseln+nmeln; ++a)
                 {
-                    double Na = (a < nseln ? Hs[a] : -Hm[a-nseln]);
-                    for (int b=0; b<nseln+nmeln; ++b)
-                    {
-                        double Nb = (b < nseln ? Hs[b] : -Hm[b-nseln]);
-                        for (int l=0; l<3; ++l) ke[ndpn*a + l][ndpn*b + l] += c*Na*Nb;
-                    }
+                    FETiedFrameOffset fo;
+                    fo.EvalCorotational(k.a, k.b, pt.m_Gap, pt.m_Lmd, k.gap, k.dg, eps);
+                    double* Gr = se.Gr(j);
+                    double* Gs = se.Gs(j);
+                    const int MN = FEElement::MAX_NODES;
+                    int off[2*MN]; double Y[2*MN]; double T[2*MN][2];
+                    for (int a=0; a<nseln; ++a) { off[a] = ndpn*a; Y[a] = -Hs[a]; T[a][0] = k.sgn*Gr[a]; T[a][1] = k.sgn*Gs[a]; }
+                    for (int b=0; b<nmeln; ++b) { off[nseln+b] = ndpn*(nseln+b); Y[nseln+b] = Hm[b]; T[nseln+b][0] = T[nseln+b][1] = 0.0; }
+                    FEContactFrame::AddHessian(ke, nseln+nmeln, off, Y, T, eps, true, fo.Hyg, fo.Hgg, w*W);
                 }
                 
                 // assemble the global stiffness
@@ -871,12 +900,12 @@ bool FETiedElasticInterface::Augment(int naug, const FETimeInfo& tp)
 			FETiedElasticSurface::Data& ds = static_cast<FETiedElasticSurface::Data&>(*el.GetMaterialPoint(j));
 
             // update Lagrange multipliers on primary surface
-            // (components in corotational frame at start of step: Lmd += eps*Rn^T.dg)
+            // (components in current corotational frame: Lmd += eps*R^T.dg)
             if (ds.m_pme)
             {
                 eps = m_epsn*ds.m_epsn;
                 FEContactFrame f;
-                f.Evaluate(m_ss, el, j, true);
+                f.Evaluate(m_ss, el, j, false);
                 ds.m_Lmd = ds.m_Lmd + f.Rt(ds.m_dg)*eps;
             }
             
@@ -894,12 +923,12 @@ bool FETiedElasticInterface::Augment(int naug, const FETimeInfo& tp)
 			FETiedElasticSurface::Data& dm = static_cast<FETiedElasticSurface::Data&>(*el.GetMaterialPoint(j));
 
             // update Lagrange multipliers on secondary surface
-            // (components in corotational frame at start of step: Lmd += eps*Rn^T.dg)
+            // (components in current corotational frame: Lmd += eps*R^T.dg)
             if (dm.m_pme)
             {
                 eps = m_epsn*dm.m_epsn;
                 FEContactFrame f;
-                f.Evaluate(m_ms, el, j, true);
+                f.Evaluate(m_ms, el, j, false);
                 dm.m_Lmd = dm.m_Lmd + f.Rt(dm.m_dg)*eps;
             }
             

@@ -94,7 +94,7 @@ figs-within-sections
 \papersides 2
 \paperpagestyle default
 \tablestyle default
-\tracking_changes false
+\tracking_changes true
 \output_changes false
 \change_bars false
 \postpone_fragile_content false
@@ -23699,8 +23699,7 @@ The interpolated motion
 \begin_inset Formula $\grad f=\Grad f\cdot\mathbf{F}^{-1}_{n+\alpha_{f}}$
 \end_inset
 
-).
-The deformation gradient that follows from the interpolated motion,
+).The deformation gradient that follows from the interpolated motion,
 \begin_inset Formula 
 \[
 \frac{\partial\boldsymbol{\chi}^{s}_{n+\alpha_{f}}}{\partial\mathbf{X}}=\left(1-\alpha_{f}\right)\mathbf{F}^{s}_{n}+\alpha_{f}\mathbf{F}^{s}_{n+1}\,,
@@ -23708,8 +23707,7 @@ The deformation gradient that follows from the interpolated motion,
 
 \end_inset
 
-is not incrementally objective.
-For a rigid-body rotation increment 
+is not incrementally objective.For a rigid-body rotation increment 
 \begin_inset Formula $\Delta\theta$
 \end_inset
 
@@ -23723,8 +23721,7 @@ For a rigid-body rotation increment
 \begin_inset Formula $\alpha_{f}<1$
 \end_inset
 
-.
-Therefore,
+.Therefore,
  the deformation gradient used to evaluate the constitutive response at 
 \begin_inset Formula $t_{n+\alpha_{f}}$
 \end_inset
@@ -23741,7 +23738,7 @@ Therefore,
 \begin_inset Formula 
 \[
 \begin{aligned}\mathbf{F}^{s}_{n+\alpha_{f}} & =\mathbf{R}^{s}_{n+\alpha_{f}}\cdot\mathbf{U}^{s}_{n+\alpha_{f}}\,, & \mathbf{U}^{s}_{n+\alpha_{f}} & =\left(1-\alpha_{f}\right)\mathbf{U}^{s}_{n}+\alpha_{f}\mathbf{U}^{s}_{n+1}\,,\\
- & & \mathbf{R}^{s}_{n+\alpha_{f}} & =\mathbf{R}^{s}_{n}\cdot\exp\left[\alpha_{f}\log\left(\mathbf{R}^{sT}_{n}\cdot\mathbf{R}^{s}_{n+1}\right)\right]\,,
+ &  & \mathbf{R}^{s}_{n+\alpha_{f}} & =\mathbf{R}^{s}_{n}\cdot\exp\left[\alpha_{f}\log\left(\mathbf{R}^{sT}_{n}\cdot\mathbf{R}^{s}_{n+1}\right)\right]\,,
 \end{aligned}
 \]
 
@@ -23752,8 +23749,7 @@ where
 \end_inset
 
  is the right polar decomposition,
- and the exponential and logarithm map a rotation vector to a rotation tensor and vice versa.
-This interpolation reduces to 
+ and the exponential and logarithm map a rotation vector to a rotation tensor and vice versa.This interpolation reduces to 
 \begin_inset Formula $\mathbf{F}^{s}_{n+1}$
 \end_inset
 
@@ -23765,8 +23761,7 @@ This interpolation reduces to
 \begin_inset Formula $\rho_{\infty}=0$
 \end_inset
 
- for this solver).
-It is objective,
+ for this solver).It is objective,
  since a rigid-body increment leaves 
 \begin_inset Formula $\mathbf{U}^{s}$
 \end_inset
@@ -23777,9 +23772,7 @@ It is objective,
 \begin_inset Formula $\alpha$
 \end_inset
 
- method is preserved.
-This deformation gradient and its inverse (used to evaluate spatial gradients of the fluid variables at the material point) are used to evaluate the following kinematic quantities,
-
+ method is preserved.This deformation gradient and its inverse (used to evaluate spatial gradients of the fluid variables at the material point) are used to evaluate the following kinematic quantities,
 \begin_inset Formula 
 \[
 J^{s}_{n+\alpha_{f}}=\det\mathbf{F}^{s}_{n+\alpha_{f}}
@@ -23842,21 +23835,16 @@ The previous form,
 \begin_inset Formula $\left(\alpha_{f}-\frac{1}{2}\right)\Delta\theta/\Delta t$
 \end_inset
 
-.
-For example,
+.For example,
  with the default value 
 \begin_inset Formula $\alpha_{f}=1$
 \end_inset
 
  and a rotation increment of 0.1 radian per time step,
- a rigidly rotating fluid-FSI domain exhibits a spurious rate of deformation equal to about 5% of its angular velocity.
-In contrast,
+ a rigidly rotating fluid-FSI domain exhibits a spurious rate of deformation equal to about 5% of its angular velocity.In contrast,
  the midpoint form is the Cayley transform of the rotation increment for a rigid-body motion,
  whose symmetric part vanishes exactly for rotation increments of any size (Hughes and Winget,
- 1980).
-It is also the second-order accurate approximation of the velocity gradient over the time step.
-The same incrementally objective kinematics are used in the biphasic-FSI and multiphasic-FSI domains.
-The stiffness with respect to the solid displacement is consistent with these kinematics:
+ 1980).It is also the second-order accurate approximation of the velocity gradient over the time step.The same incrementally objective kinematics are used in the biphasic-FSI and multiphasic-FSI domains.The stiffness with respect to the solid displacement is consistent with these kinematics:
  each column is evaluated as the directional derivative of the residual integrand for a perturbation
 \begin_inset Formula $\delta\mathbf{F}_{n+1}=\mathbf{e}_{k}\otimes\Grad N_{b}$
 \end_inset
@@ -23908,8 +23896,7 @@ tuple "list"
 
 .
  The resulting tangent was verified against a finite-difference derivative of the residual for the fluid-FSI,
- biphasic-FSI and multiphasic-FSI domains.
-Similarly,
+ biphasic-FSI and multiphasic-FSI domains.Similarly,
  we evaluate velocity derivatives at the intermediate time 
 \begin_inset Formula $t_{n+\alpha_{m}}=t_{n}+\alpha_{m}\left(t_{n+1}-t_{n}\right)$
 \end_inset
@@ -50264,7 +50251,6 @@ The form
  shell,
  biphasic,
  multiphasic and FSI domains.
-
 \end_layout
 
 \begin_layout Standard
@@ -50601,8 +50587,7 @@ where
 \begin_inset Formula $\mathcal{D}_{\alpha_{f}}\left[\delta\mathbf{F}_{n+1}\right]=\delta\mathbf{F}_{n+1}$
 \end_inset
 
-.
-To linearize the virtual work,
+.To linearize the virtual work,
  we need to express the integrals appearing in 
 \begin_inset Formula $\delta W_{int}$
 \end_inset
@@ -50943,8 +50928,7 @@ tuple "list"
 
 which is not symmetric (a non-symmetric linear solver gives the best convergence).
  The same approach is used in the three-field solid and shell domains,
- where the element pressure is evaluated from the element volume in the corresponding configuration.
-The discretization of the mass term in the internal work is
+ where the element pressure is evaluated from the element volume in the corresponding configuration.The discretization of the mass term in the internal work is
 \begin_inset Formula 
 \[
 \int_{b}\delta\mathbf{v}\cdot\frac{\alpha_{m}}{\beta\Delta t^{2}}\rho\Delta\mathbf{u}\,dv=\sum_{a}\delta\mathbf{v}_{a}\cdot\sum_{b}\int_{b}\mathbf{M}_{ab}\,dv\cdot\Delta\mathbf{u}_{b}\,,
@@ -55813,8 +55797,7 @@ tuple "list"
 
 \end_inset
 
-.
-When the 
+.When the 
 \emph on
 smooth_aug
 \emph default
@@ -63791,6 +63774,20 @@ tuple "list"
 .
  The same treatment is applied in the related tied-facet-on-facet,
  sticky and mortar-tied interfaces.
+ The optional initial gap of the tied-facet-on-facet interface (gap_offset option) is rotated with the corotational frame of the current configuration,
+ as described in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Contact-Frame-Invariance"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+.
 \end_layout
 
 \begin_layout Section
@@ -64081,29 +64078,21 @@ tuple "list"
 \end_inset
 
 ) are stored.
- Over the time step from 
-\begin_inset Formula $t_{n}$
-\end_inset
-
- to 
-\begin_inset Formula $t_{n+1}$
-\end_inset
-
-,
- the interface enforces the vanishing of
+ The interface enforces the vanishing of
 \begin_inset Formula 
 \begin{equation}
-\mathbf{d}=\mathbf{g}-\mathbf{R}_{n}\cdot\hat{\mathbf{G}}\label{eq:te-gap-deviation}
+\mathbf{d}=\mathbf{g}-\mathbf{R}\cdot\hat{\mathbf{G}}\label{eq:te-gap-deviation}
 \end{equation}
 
 \end_inset
 
 where 
-\begin_inset Formula $\mathbf{R}_{n}$
+\begin_inset Formula $\mathbf{R}$
 \end_inset
 
- is the corotational frame evaluated on the converged configuration at 
-\begin_inset Formula $t_{n}$
+ is the corotational frame evaluated on the current configuration,
+ from the same nodal positions as 
+\begin_inset Formula $\mathbf{g}$
 \end_inset
 
 .
@@ -64129,7 +64118,7 @@ where
 ,
 \begin_inset Formula 
 \begin{equation}
-\mathbf{t}=\boldsymbol{\lambda}+\varepsilon_{n}\mathbf{d}\,,\quad\boldsymbol{\lambda}=\mathbf{R}_{n}\cdot\hat{\boldsymbol{\lambda}}\label{eq:te-augmented-Lagrangian}
+\mathbf{t}=\boldsymbol{\lambda}+\varepsilon_{n}\mathbf{d}\,,\quad\boldsymbol{\lambda}=\mathbf{R}\cdot\hat{\boldsymbol{\lambda}}\label{eq:te-augmented-Lagrangian}
 \end{equation}
 
 \end_inset
@@ -64142,7 +64131,7 @@ where the components
  and updated after each converged Newton solution according to
 \begin_inset Formula 
 \begin{equation}
-\hat{\boldsymbol{\lambda}}\leftarrow\hat{\boldsymbol{\lambda}}+\varepsilon_{n}\mathbf{R}^{T}_{n}\cdot\mathbf{d}\label{eq:te-augmentation}
+\hat{\boldsymbol{\lambda}}\leftarrow\hat{\boldsymbol{\lambda}}+\varepsilon_{n}\mathbf{R}^{T}\cdot\mathbf{d}\label{eq:te-augmentation}
 \end{equation}
 
 \end_inset
@@ -64159,44 +64148,69 @@ Since
 \begin_inset Formula $\hat{\boldsymbol{\lambda}}$
 \end_inset
 
- are referred to 
-\begin_inset Formula $\mathbf{R}_{n}$
-\end_inset
-
-,
- both rotate with the interface from one time step to the next,
- while remaining fixed within a time step.
- Under a superposed rigid motion,
- the vectorial Lagrange multiplier is therefore frame invariant once the augmentations have converged,
- and the enforced initial gap lags the rotation by at most one time step,
- producing an error of order 
-\begin_inset Formula $\left|\mathbf{G}\right|\Delta\theta$
-\end_inset
-
- that does not accumulate over time steps.
- (Rotating 
-\begin_inset Formula $\mathbf{G}$
-\end_inset
-
- with the current frame 
+ are referred to the frame 
 \begin_inset Formula $\mathbf{R}$
 \end_inset
 
- within the time step would be exactly objective,
- but it introduces a rotational coupling of the two surfaces that was found to over-constrain non-conforming interfaces with large initial gaps in dynamic analyses using the augmented Lagrangian method.)
-\end_layout
-
-\begin_layout Standard
-With 
-\begin_inset Formula $\boldsymbol{\lambda}$
+ of the current configuration,
+ 
+\begin_inset Formula $\mathbf{R}\cdot\hat{\mathbf{G}}$
 \end_inset
 
  and 
+\begin_inset Formula $\boldsymbol{\lambda}$
+\end_inset
+
+ rotate exactly with the interface,
+ and the formulation is frame invariant.
+ Referring them instead to the frame 
+\begin_inset Formula $\mathbf{R}_{n}$
+\end_inset
+
+ of the converged configuration at 
+\begin_inset Formula $t_{n}$
+\end_inset
+
+,
+ i.e.,
+ holding 
 \begin_inset Formula $\mathbf{R}_{n}\cdot\hat{\mathbf{G}}$
 \end_inset
 
- held constant within a time step,
- the contact forces derive from the potential
+ fixed within the time step from 
+\begin_inset Formula $t_{n}$
+\end_inset
+
+ to 
+\begin_inset Formula $t_{n+1}$
+\end_inset
+
+,
+ is not objective:
+ a rotation increment 
+\begin_inset Formula $\Delta\mathbf{R}$
+\end_inset
+
+ of the interface over the time step produces a spurious gap 
+\begin_inset Formula $\left(\Delta\mathbf{R}-\mathbf{I}\right)\cdot\mathbf{R}_{n}\cdot\hat{\mathbf{G}}$
+\end_inset
+
+,
+ hence a spurious traction of order 
+\begin_inset Formula $\varepsilon_{n}\left|\mathbf{G}\right|\Delta\theta$
+\end_inset
+
+,
+ where 
+\begin_inset Formula $\Delta\theta$
+\end_inset
+
+ is the rotation angle over the time step,
+ which depends on the time step size.
+\end_layout
+
+\begin_layout Standard
+The contact forces derive from the potential
 \begin_inset Formula 
 \begin{equation}
 \Pi=\int_{\Gamma}\left(\boldsymbol{\lambda}\cdot\mathbf{d}+\frac{\varepsilon_{n}}{2}\mathbf{d}\cdot\mathbf{d}\right)J^{\left(1\right)}_{\eta0}\,d\eta^{\left(1\right)}_{1}d\eta^{\left(1\right)}_{2}\,,\quad\delta G_{c}=-\delta\Pi\label{eq:te-potential}
@@ -64204,13 +64218,116 @@ With
 
 \end_inset
 
-since 
-\begin_inset Formula $\delta\mathbf{d}=\delta\mathbf{v}^{\left(2\right)}-\delta\mathbf{v}^{\left(1\right)}$
+where the integrand 
+\begin_inset Formula $\psi=\boldsymbol{\lambda}\cdot\mathbf{d}+\frac{\varepsilon_{n}}{2}\mathbf{d}\cdot\mathbf{d}$
+\end_inset
+
+ depends on the gap 
+\begin_inset Formula $\mathbf{g}$
+\end_inset
+
+ and,
+ through 
+\begin_inset Formula $\mathbf{R}$
+\end_inset
+
+,
+ on the covariant base vectors 
+\begin_inset Formula $\mathbf{g}^{\left(1\right)}_{\alpha}$
+\end_inset
+
+ of 
+\begin_inset Formula $\Gamma^{\left(1\right)}$
+\end_inset
+
+ at the integration point.
+ Since 
+\begin_inset Formula $\delta\mathbf{g}=\delta\mathbf{v}^{\left(2\right)}-\delta\mathbf{v}^{\left(1\right)}$
+\end_inset
+
+ and 
+\begin_inset Formula $\delta\mathbf{g}^{\left(1\right)}_{\alpha}=\partial\delta\mathbf{v}^{\left(1\right)}/\partial\eta^{\left(1\right)}_{\alpha}$
+\end_inset
+
+,
+\begin_inset Formula 
+\begin{equation}
+\delta G_{c}=\int_{\Gamma}\left[\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\mathbf{t}-\sum^{2}_{\alpha=1}\frac{\partial\delta\mathbf{v}^{\left(1\right)}}{\partial\eta^{\left(1\right)}_{\alpha}}\cdot\frac{\partial\psi}{\partial\mathbf{g}^{\left(1\right)}_{\alpha}}\right]J^{\left(1\right)}_{\eta0}\,d\eta^{\left(1\right)}_{1}d\eta^{\left(1\right)}_{2}\label{eq:te-contact-integral-frame}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $\mathbf{t}=\partial\psi/\partial\mathbf{g}=\boldsymbol{\lambda}+\varepsilon_{n}\mathbf{d}$
+\end_inset
+
+ is the contact traction of Eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:te-augmented-Lagrangian"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+,
+ and
+\begin_inset Formula 
+\begin{equation}
+\frac{\partial\psi}{\partial\mathbf{g}^{\left(1\right)}_{\alpha}}=\left(\frac{\partial\left(\mathbf{R}\cdot\hat{\boldsymbol{\lambda}}\right)}{\partial\mathbf{g}^{\left(1\right)}_{\alpha}}\right)^{T}\cdot\mathbf{d}-\left(\frac{\partial\left(\mathbf{R}\cdot\hat{\mathbf{G}}\right)}{\partial\mathbf{g}^{\left(1\right)}_{\alpha}}\right)^{T}\cdot\mathbf{t}\label{eq:te-frame-gradient}
+\end{equation}
+
+\end_inset
+
+is evaluated at fixed 
+\begin_inset Formula $\mathbf{g}$
 \end_inset
 
 .
- Therefore the tied interface is conservative,
- and its tangent stiffness is symmetric.
+ The second term in Eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:te-contact-integral-frame"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+ produces forces on the nodes of 
+\begin_inset Formula $\Gamma^{\left(1\right)}$
+\end_inset
+
+,
+ which balance the moment of the pair of tractions acting on 
+\begin_inset Formula $\Gamma^{\left(1\right)}$
+\end_inset
+
+ and 
+\begin_inset Formula $\Gamma^{\left(2\right)}$
+\end_inset
+
+ at points separated by the offset 
+\begin_inset Formula $\mathbf{R}\cdot\hat{\mathbf{G}}$
+\end_inset
+
+,
+ so that the tied interface conserves angular momentum;
+ omitting them would leave a net couple 
+\begin_inset Formula $\left(\mathbf{R}\cdot\hat{\mathbf{G}}\right)\times\mathbf{t}$
+\end_inset
+
+ at every tied point.
+ Since the contact forces derive from a potential,
+ the tied interface is conservative and its tangent stiffness is symmetric;
+ this variational structure also keeps the augmented Lagrangian iterations convergent.
 \end_layout
 
 \begin_layout Subsection
@@ -64247,12 +64364,12 @@ represents the linearization of
 
 .
  Since 
-\begin_inset Formula $\boldsymbol{\lambda}$
+\begin_inset Formula $\hat{\boldsymbol{\lambda}}$
 \end_inset
 
 ,
  
-\begin_inset Formula $\mathbf{R}_{n}\cdot\hat{\mathbf{G}}$
+\begin_inset Formula $\hat{\mathbf{G}}$
 \end_inset
 
  and 
@@ -64261,14 +64378,98 @@ represents the linearization of
 
  are constant within a time step,
  and the parametric coordinates of the tied points are invariant,
+ it follows from Eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:te-potential"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+ that 
+\begin_inset Formula $D\left(\delta G_{c}\right)$
+\end_inset
+
+ is the negative of the second variation of 
+\begin_inset Formula $\Pi$
+\end_inset
+
+,
 \begin_inset Formula 
 \begin{equation}
-D\mathbf{t}=\varepsilon_{n}\left(\Delta\mathbf{u}^{\left(2\right)}-\Delta\mathbf{u}^{\left(1\right)}\right)\label{eq:te-contact-traction-linearization}
+\begin{aligned}D\left(\delta G_{c}\right)=-\int_{\Gamma} & \left[\delta\mathbf{g}\cdot\varepsilon_{n}\Delta\mathbf{g}+\sum^{2}_{\beta=1}\delta\mathbf{g}\cdot\mathbf{H}_{g\beta}\cdot\Delta\mathbf{g}^{\left(1\right)}_{\beta}+\sum^{2}_{\alpha=1}\delta\mathbf{g}^{\left(1\right)}_{\alpha}\cdot\mathbf{H}^{T}_{g\alpha}\cdot\Delta\mathbf{g}\right.\\
+ & \left.+\sum^{2}_{\alpha=1}\sum^{2}_{\beta=1}\delta\mathbf{g}^{\left(1\right)}_{\alpha}\cdot\mathbf{H}_{\alpha\beta}\cdot\Delta\mathbf{g}^{\left(1\right)}_{\beta}\right]J^{\left(1\right)}_{\eta0}\,d\eta^{\left(1\right)}_{1}d\eta^{\left(1\right)}_{2}
+\end{aligned}
+\label{eq:te-contact-integral-linearization-frame}
 \end{equation}
 
 \end_inset
 
-and thus
+where 
+\begin_inset Formula $\Delta\mathbf{g}=\Delta\mathbf{u}^{\left(2\right)}-\Delta\mathbf{u}^{\left(1\right)}$
+\end_inset
+
+,
+ 
+\begin_inset Formula $\Delta\mathbf{g}^{\left(1\right)}_{\beta}=\partial\Delta\mathbf{u}^{\left(1\right)}/\partial\eta^{\left(1\right)}_{\beta}$
+\end_inset
+
+,
+ and
+\begin_inset Formula 
+\begin{equation}
+\mathbf{H}_{g\alpha}=\frac{\partial^{2}\psi}{\partial\mathbf{g}\,\partial\mathbf{g}^{\left(1\right)}_{\alpha}}=\frac{\partial\left(\mathbf{R}\cdot\hat{\boldsymbol{\lambda}}\right)}{\partial\mathbf{g}^{\left(1\right)}_{\alpha}}-\varepsilon_{n}\frac{\partial\left(\mathbf{R}\cdot\hat{\mathbf{G}}\right)}{\partial\mathbf{g}^{\left(1\right)}_{\alpha}}\,,\quad\mathbf{H}_{\alpha\beta}=\frac{\partial^{2}\psi}{\partial\mathbf{g}^{\left(1\right)}_{\alpha}\partial\mathbf{g}^{\left(1\right)}_{\beta}}\label{eq:te-frame-hessian}
+\end{equation}
+
+\end_inset
+
+are second derivatives of 
+\begin_inset Formula $\psi$
+\end_inset
+
+,
+ the remaining block being 
+\begin_inset Formula $\partial^{2}\psi/\partial\mathbf{g}\partial\mathbf{g}=\varepsilon_{n}\mathbf{I}$
+\end_inset
+
+.
+ This linearization is symmetric in the virtual velocities and the displacement increments.
+ When 
+\begin_inset Formula $\hat{\mathbf{G}}=\mathbf{0}$
+\end_inset
+
+ and 
+\begin_inset Formula $\hat{\boldsymbol{\lambda}}=\mathbf{0}$
+\end_inset
+
+,
+ 
+\begin_inset Formula $\mathbf{H}_{g\alpha}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{H}_{\alpha\beta}$
+\end_inset
+
+ vanish and Eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:te-contact-integral-linearization-frame"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+ reduces to
 \begin_inset Formula 
 \begin{equation}
 D\left(\delta G_{c}\right)=\int_{\Gamma}\left(\delta\mathbf{v}^{\left(1\right)}-\delta\mathbf{v}^{\left(2\right)}\right)\cdot\varepsilon_{n}\left(\Delta\mathbf{u}^{\left(2\right)}-\Delta\mathbf{u}^{\left(1\right)}\right)J^{\left(1\right)}_{\eta0}\,d\eta^{\left(1\right)}_{1}d\eta^{\left(1\right)}_{2}\label{eq:te-contact-integral-linearization-3}
@@ -64276,7 +64477,60 @@ D\left(\delta G_{c}\right)=\int_{\Gamma}\left(\delta\mathbf{v}^{\left(1\right)}-
 
 \end_inset
 
-which is symmetric in the virtual velocities and the displacement increments.
+The derivatives of 
+\begin_inset Formula $\mathbf{R}\cdot\hat{\mathbf{v}}=\hat{v}_{1}\mathbf{e}_{1}+\hat{v}_{2}\mathbf{e}_{2}+\hat{v}_{3}\mathbf{n}$
+\end_inset
+
+,
+ for fixed components 
+\begin_inset Formula $\hat{\mathbf{v}}$
+\end_inset
+
+,
+ follow from Eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:contact-corotational-frame"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+,
+ where (dropping the superscript 
+\begin_inset Formula $\left(1\right)$
+\end_inset
+
+)
+\begin_inset Formula 
+\begin{equation}
+\begin{aligned}\frac{\partial\mathbf{e}_{1}}{\partial\mathbf{g}_{1}} & =\frac{\mathbf{I}-\mathbf{e}_{1}\otimes\mathbf{e}_{1}}{\left|\mathbf{g}_{1}\right|}\,, & \frac{\partial\mathbf{e}_{1}}{\partial\mathbf{g}_{2}} & =\mathbf{0}\,,\\
+\frac{\partial\mathbf{n}}{\partial\mathbf{g}_{1}} & =-\frac{\left(\mathbf{I}-\mathbf{n}\otimes\mathbf{n}\right)\cdot\left[\mathbf{g}_{2}\right]_{\times}}{\left|\mathbf{g}_{1}\times\mathbf{g}_{2}\right|}\,, & \frac{\partial\mathbf{n}}{\partial\mathbf{g}_{2}} & =\frac{\left(\mathbf{I}-\mathbf{n}\otimes\mathbf{n}\right)\cdot\left[\mathbf{g}_{1}\right]_{\times}}{\left|\mathbf{g}_{1}\times\mathbf{g}_{2}\right|}\,,\\
+\frac{\partial\mathbf{e}_{2}}{\partial\mathbf{g}_{\alpha}} & =\left[\mathbf{n}\right]_{\times}\cdot\frac{\partial\mathbf{e}_{1}}{\partial\mathbf{g}_{\alpha}}-\left[\mathbf{e}_{1}\right]_{\times}\cdot\frac{\partial\mathbf{n}}{\partial\mathbf{g}_{\alpha}}\,,
+\end{aligned}
+\label{eq:contact-frame-derivatives}
+\end{equation}
+
+\end_inset
+
+and 
+\begin_inset Formula $\left[\mathbf{w}\right]_{\times}$
+\end_inset
+
+ denotes the skew-symmetric tensor such that 
+\begin_inset Formula $\left[\mathbf{w}\right]_{\times}\cdot\mathbf{a}=\mathbf{w}\times\mathbf{a}$
+\end_inset
+
+.
+ The second derivatives 
+\begin_inset Formula $\mathbf{H}_{\alpha\beta}$
+\end_inset
+
+ are evaluated in closed form by differentiating these expressions once more.
  For use in other tied interfaces (e.g.,
  Section 
 \begin_inset CommandInset ref
@@ -64394,7 +64648,7 @@ where
 where
 \begin_inset Formula 
 \begin{equation}
-\boxed{\begin{aligned}\mathbf{f}^{\left(1\right)}_{a} & =J^{\left(1\right)}_{\eta0}N^{\left(1\right)}_{a}\mathbf{t}\\
+\boxed{\begin{aligned}\mathbf{f}^{\left(1\right)}_{a} & =J^{\left(1\right)}_{\eta0}\left(N^{\left(1\right)}_{a}\mathbf{t}-\sum^{2}_{\alpha=1}\frac{\partial N^{\left(1\right)}_{a}}{\partial\eta^{\left(1\right)}_{\alpha}}\frac{\partial\psi}{\partial\mathbf{g}^{\left(1\right)}_{\alpha}}\right)\\
 \mathbf{f}^{\left(2\right)}_{b} & =-J^{\left(1\right)}_{\eta0}N^{\left(2\right)}_{b}\mathbf{t}
 \end{aligned}
 }\label{eq:te-element-load-vectors}
@@ -64428,7 +64682,78 @@ with
 
 \end_inset
 
-This element stiffness matrix is symmetric,
+when 
+\begin_inset Formula $\hat{\mathbf{G}}=\mathbf{0}$
+\end_inset
+
+ and 
+\begin_inset Formula $\hat{\boldsymbol{\lambda}}=\mathbf{0}$
+\end_inset
+
+.
+ Otherwise,
+ the frame terms of Eq.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:te-contact-integral-linearization-frame"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+ add to each block the contribution
+\begin_inset Formula 
+\begin{equation}
+\Delta\mathbf{K}_{pq}=-J^{\left(1\right)}_{\eta0}\left(Y_{p}\sum^{2}_{\beta=1}T^{\beta}_{q}\mathbf{H}_{g\beta}+\sum^{2}_{\alpha=1}T^{\alpha}_{p}Y_{q}\mathbf{H}^{T}_{g\alpha}+\sum^{2}_{\alpha=1}\sum^{2}_{\beta=1}T^{\alpha}_{p}T^{\beta}_{q}\mathbf{H}_{\alpha\beta}\right)\label{eq:te-element-stiffnesses-frame}
+\end{equation}
+
+\end_inset
+
+where 
+\begin_inset Formula $p$
+\end_inset
+
+ and 
+\begin_inset Formula $q$
+\end_inset
+
+ denote nodes of either surface,
+ with 
+\begin_inset Formula $Y_{p}=-N^{\left(1\right)}_{p}$
+\end_inset
+
+ and 
+\begin_inset Formula $T^{\alpha}_{p}=\partial N^{\left(1\right)}_{p}/\partial\eta^{\left(1\right)}_{\alpha}$
+\end_inset
+
+ for nodes of 
+\begin_inset Formula $\Gamma^{\left(1\right)}$
+\end_inset
+
+,
+ and 
+\begin_inset Formula $Y_{p}=N^{\left(2\right)}_{p}$
+\end_inset
+
+ and 
+\begin_inset Formula $T^{\alpha}_{p}=0$
+\end_inset
+
+ for nodes of 
+\begin_inset Formula $\Gamma^{\left(2\right)}$
+\end_inset
+
+.
+ (On the bottom surface of shells the base vectors are reversed,
+ so 
+\begin_inset Formula $T^{\alpha}_{p}$
+\end_inset
+
+ changes sign.) This element stiffness matrix is symmetric,
  consistent with the potential of Eq.
  
 \begin_inset CommandInset ref
@@ -64742,12 +65067,12 @@ If
  found when the interface is activated is not closed;
  instead,
  the interface enforces 
-\begin_inset Formula $\mathbf{g}-\mathbf{G}=\mathbf{0}$
+\begin_inset Formula $\mathbf{g}-\mathbf{R}\cdot\hat{\mathbf{G}}=\mathbf{0}$
 \end_inset
 
 ,
  and the penalty and augmented Lagrangian expressions below use 
-\begin_inset Formula $\mathbf{g}-\mathbf{G}$
+\begin_inset Formula $\mathbf{g}-\mathbf{R}\cdot\hat{\mathbf{G}}$
 \end_inset
 
  in place of 
@@ -64755,17 +65080,97 @@ If
 \end_inset
 
 .
- The initial gap 
-\begin_inset Formula $\mathbf{G}$
+ Here,
+ 
+\begin_inset Formula $\hat{\mathbf{G}}=\mathbf{R}^{T}\cdot\mathbf{G}$
 \end_inset
 
- and the vectorial Lagrange multiplier 
+ are the components of the initial gap in the corotational frame 
+\begin_inset Formula $\mathbf{R}$
+\end_inset
+
+ of 
+\begin_inset Formula $\gamma^{\left(1\right)}$
+\end_inset
+
+ at the integration point,
+ where 
+\begin_inset Formula $\mathbf{R}$
+\end_inset
+
+ is evaluated on the current configuration,
+ as in the tied-elastic interface (Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Tied-Elastic-Contact"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+).
+ Since 
+\begin_inset Formula $\mathbf{R}$
+\end_inset
+
+ depends on the nodal positions of 
+\begin_inset Formula $\gamma^{\left(1\right)}$
+\end_inset
+
+,
+ the load vector and stiffness matrix include the corresponding frame terms (Eqs.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:te-contact-integral-frame"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+-
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:te-element-stiffnesses-frame"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+),
+ with the Lagrange multiplier held fixed as a spatial vector,
+ so that 
+\begin_inset Formula $\partial\psi/\partial\mathbf{g}^{\left(1\right)}_{\alpha}=-\left(\partial\left(\mathbf{R}\cdot\hat{\mathbf{G}}\right)/\partial\mathbf{g}^{\left(1\right)}_{\alpha}\right)^{T}\cdot\mathbf{t}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{H}_{g\alpha}=-\varepsilon_{n}\,\partial\left(\mathbf{R}\cdot\hat{\mathbf{G}}\right)/\partial\mathbf{g}^{\left(1\right)}_{\alpha}$
+\end_inset
+
+.
+ Since this interface integrates over the current area,
+ the stiffness matrix also includes a non-symmetric term arising from the linearization of 
+\begin_inset Formula $J^{\left(1\right)}_{\eta}$
+\end_inset
+
+ in these frame forces;
+ it is omitted when a symmetric stiffness matrix is used.
+ The vectorial Lagrange multiplier 
 \begin_inset Formula $\boldsymbol{\lambda}$
 \end_inset
 
- are stored as spatial vectors.
+ is stored as a spatial vector.
  To preserve frame invariance,
- they are pushed forward at the start of each time step with the rotation of the primary surface at the integration point,
+ it is pushed forward at the start of each time step with the rotation of the primary surface at the integration point,
  as described in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -65336,12 +65741,12 @@ If
  found when the interface is activated is not closed;
  instead,
  the interface enforces 
-\begin_inset Formula $\mathbf{g}-\mathbf{G}=\mathbf{0}$
+\begin_inset Formula $\mathbf{g}-\mathbf{R}\cdot\hat{\mathbf{G}}=\mathbf{0}$
 \end_inset
 
 ,
  and the penalty and augmented Lagrangian expressions below use 
-\begin_inset Formula $\mathbf{g}-\mathbf{G}$
+\begin_inset Formula $\mathbf{g}-\mathbf{R}\cdot\hat{\mathbf{G}}$
 \end_inset
 
  in place of 
@@ -65349,17 +65754,97 @@ If
 \end_inset
 
 .
- The initial gap 
-\begin_inset Formula $\mathbf{G}$
+ Here,
+ 
+\begin_inset Formula $\hat{\mathbf{G}}=\mathbf{R}^{T}\cdot\mathbf{G}$
 \end_inset
 
- and the vectorial Lagrange multiplier 
+ are the components of the initial gap in the corotational frame 
+\begin_inset Formula $\mathbf{R}$
+\end_inset
+
+ of 
+\begin_inset Formula $\gamma^{\left(1\right)}$
+\end_inset
+
+ at the integration point,
+ where 
+\begin_inset Formula $\mathbf{R}$
+\end_inset
+
+ is evaluated on the current configuration,
+ as in the tied-elastic interface (Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Tied-Elastic-Contact"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+).
+ Since 
+\begin_inset Formula $\mathbf{R}$
+\end_inset
+
+ depends on the nodal positions of 
+\begin_inset Formula $\gamma^{\left(1\right)}$
+\end_inset
+
+,
+ the load vector and stiffness matrix include the corresponding frame terms (Eqs.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:te-contact-integral-frame"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+-
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:te-element-stiffnesses-frame"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+),
+ with the Lagrange multiplier held fixed as a spatial vector,
+ so that 
+\begin_inset Formula $\partial\psi/\partial\mathbf{g}^{\left(1\right)}_{\alpha}=-\left(\partial\left(\mathbf{R}\cdot\hat{\mathbf{G}}\right)/\partial\mathbf{g}^{\left(1\right)}_{\alpha}\right)^{T}\cdot\mathbf{t}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{H}_{g\alpha}=-\varepsilon_{n}\,\partial\left(\mathbf{R}\cdot\hat{\mathbf{G}}\right)/\partial\mathbf{g}^{\left(1\right)}_{\alpha}$
+\end_inset
+
+.
+ Since this interface integrates over the current area,
+ the stiffness matrix also includes a non-symmetric term arising from the linearization of 
+\begin_inset Formula $J^{\left(1\right)}_{\eta}$
+\end_inset
+
+ in these frame forces;
+ it is omitted when the global stiffness matrix is symmetric.
+ The vectorial Lagrange multiplier 
 \begin_inset Formula $\boldsymbol{\lambda}$
 \end_inset
 
- are stored as spatial vectors.
+ is stored as a spatial vector.
  To preserve frame invariance,
- they are pushed forward at the start of each time step with the rotation of the primary surface at the integration point,
+ it is pushed forward at the start of each time step with the rotation of the primary surface at the integration point,
  as described in Section 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -67170,12 +67655,12 @@ If
  found when the interface is activated is not closed;
  instead,
  the interface enforces 
-\begin_inset Formula $\mathbf{g}-\mathbf{G}=\mathbf{0}$
+\begin_inset Formula $\mathbf{g}-\mathbf{R}\cdot\hat{\mathbf{G}}=\mathbf{0}$
 \end_inset
 
 ,
  and the penalty and augmented Lagrangian expressions below use 
-\begin_inset Formula $\mathbf{g}-\mathbf{G}$
+\begin_inset Formula $\mathbf{g}-\mathbf{R}\cdot\hat{\mathbf{G}}$
 \end_inset
 
  in place of 
@@ -67183,11 +67668,117 @@ If
 \end_inset
 
 .
- The initial gap 
-\begin_inset Formula $\mathbf{G}$
+ Here,
+ 
+\begin_inset Formula $\hat{\mathbf{G}}=\mathbf{R}^{T}\cdot\mathbf{G}$
 \end_inset
 
- and the vectorial Lagrange multipliers 
+ are the components of the initial gap in the corotational frame 
+\begin_inset Formula $\mathbf{R}$
+\end_inset
+
+ of 
+\begin_inset Formula $\gamma^{\left(1\right)}$
+\end_inset
+
+ at the integration point,
+ where 
+\begin_inset Formula $\mathbf{R}$
+\end_inset
+
+ is evaluated on the intermediate configuration 
+\begin_inset Formula $\mathbf{x}_{n+\alpha_{f}}$
+\end_inset
+
+,
+ like 
+\begin_inset Formula $\mathbf{g}$
+\end_inset
+
+,
+ as in the tied-elastic interface (Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Tied-Elastic-Contact"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+).
+ Since 
+\begin_inset Formula $\mathbf{R}$
+\end_inset
+
+ depends on the nodal positions of 
+\begin_inset Formula $\gamma^{\left(1\right)}$
+\end_inset
+
+,
+ the load vector and stiffness matrix include the corresponding frame terms (Eqs.
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:te-contact-integral-frame"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+-
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "eq:te-element-stiffnesses-frame"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+),
+ with the Lagrange multiplier held fixed as a spatial vector,
+ so that 
+\begin_inset Formula $\partial\psi/\partial\mathbf{g}^{\left(1\right)}_{\alpha}=-\left(\partial\left(\mathbf{R}\cdot\hat{\mathbf{G}}\right)/\partial\mathbf{g}^{\left(1\right)}_{\alpha}\right)^{T}\cdot\mathbf{t}$
+\end_inset
+
+ and 
+\begin_inset Formula $\mathbf{H}_{g\alpha}=-\varepsilon_{n}\,\partial\left(\mathbf{R}\cdot\hat{\mathbf{G}}\right)/\partial\mathbf{g}^{\left(1\right)}_{\alpha}$
+\end_inset
+
+ (with 
+\begin_inset Formula $\varepsilon_{s}$
+\end_inset
+
+ in place of 
+\begin_inset Formula $\varepsilon_{n}$
+\end_inset
+
+,
+ and with derivatives with respect to 
+\begin_inset Formula $\mathbf{x}_{n+1}$
+\end_inset
+
+ multiplied by 
+\begin_inset Formula $\alpha_{f}$
+\end_inset
+
+).
+ Since this interface integrates over the current area,
+ the stiffness matrix also includes a non-symmetric term arising from the linearization of 
+\begin_inset Formula $J^{\left(1\right)}_{\eta}$
+\end_inset
+
+ in these frame forces;
+ it is omitted when the symmetric_stiffness option is selected or when the global stiffness matrix is symmetric.
+ The vectorial Lagrange multipliers 
 \begin_inset Formula $\boldsymbol{\lambda}_{s}$
 \end_inset
 
@@ -67787,7 +68378,7 @@ where
 \end_inset
 
 ,
- every stored vector 
+ every stored Lagrange multiplier 
 \begin_inset Formula $\mathbf{v}$
 \end_inset
 
@@ -67817,20 +68408,7 @@ after which
 \begin_inset Formula $\mathbf{v}=\mathbf{R}_{n}\cdot\hat{\mathbf{v}}$
 \end_inset
 
- during the time step,
- as done in the tied-elastic interface (Section 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Tied-Elastic-Contact"
-plural "false"
-caps "false"
-noprefix "false"
-nolink "false"
-tuple "list"
-
-\end_inset
-
-).
+ during the time step.
  Since the frame is always evaluated on the configuration at the start of the time step,
  repeated evaluations within a time step are idempotent.
 \end_layout
@@ -67848,9 +68426,31 @@ Within a time step the stored vectors are held fixed,
  as required.
  Vectorial Lagrange multipliers are frame invariant once the augmentations have converged,
  since they converge to the constraint traction.
- An initial gap lags the rotation by at most one time step,
- producing an error of order 
-\begin_inset Formula $\left|\mathbf{G}\right|\Delta\theta$
+\end_layout
+
+\begin_layout Standard
+This push-forward is adequate for Lagrange multipliers,
+ which are re-established by the solution itself,
+ but not for a stored geometric offset such as the initial gap 
+\begin_inset Formula $\mathbf{G}$
+\end_inset
+
+ between non-conforming surfaces.
+ Holding 
+\begin_inset Formula $\mathbf{R}_{n}\cdot\hat{\mathbf{G}}$
+\end_inset
+
+ fixed within a time step while the interface rotates by 
+\begin_inset Formula $\Delta\mathbf{R}$
+\end_inset
+
+ produces a spurious gap 
+\begin_inset Formula $\left(\Delta\mathbf{R}-\mathbf{I}\right)\cdot\mathbf{R}_{n}\cdot\hat{\mathbf{G}}$
+\end_inset
+
+,
+ hence spurious tractions of order 
+\begin_inset Formula $\varepsilon\left|\mathbf{G}\right|\Delta\theta$
 \end_inset
 
 ,
@@ -67858,17 +68458,63 @@ Within a time step the stored vectors are held fixed,
 \begin_inset Formula $\Delta\theta$
 \end_inset
 
- is the rotation increment over a time step.
- This error does not accumulate,
- because 
-\begin_inset Formula $\mathbf{R}_{n}$
+ is the rotation increment over a time step,
+ which depend on the time step size.
+ Therefore,
+ initial gaps are stored by their components 
+\begin_inset Formula $\hat{\mathbf{G}}=\mathbf{R}^{T}\cdot\mathbf{G}$
 \end_inset
 
- is exact at every time step.
+,
+ and the gap function is evaluated as 
+\begin_inset Formula $\mathbf{g}-\mathbf{R}\cdot\hat{\mathbf{G}}$
+\end_inset
+
+ with 
+\begin_inset Formula $\mathbf{R}$
+\end_inset
+
+ evaluated on the same configuration as 
+\begin_inset Formula $\mathbf{g}$
+\end_inset
+
+,
+ as detailed for the tied-elastic interface in Section 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Tied-Elastic-Contact"
+plural "false"
+caps "false"
+noprefix "false"
+nolink "false"
+tuple "list"
+
+\end_inset
+
+.
+ Since 
+\begin_inset Formula $\mathbf{R}$
+\end_inset
+
+ then depends on the nodal positions of the primary surface,
+ the interface also exerts forces on those nodes through 
+\begin_inset Formula $\mathbf{R}$
+\end_inset
+
+.
+ These forces balance the moment of the pair of tied tractions acting at the two ends of the offset 
+\begin_inset Formula $\mathbf{R}\cdot\hat{\mathbf{G}}$
+\end_inset
+
+,
+ so that angular momentum is conserved,
+ and they make the formulation variational,
+ which keeps the augmented Lagrangian iterations convergent.
+ Their linearization is included in the tangent stiffness matrix.
 \end_layout
 
 \begin_layout Standard
-This scheme is used in the following interfaces:
+These schemes are used in the following interfaces:
 \end_layout
 
 \begin_layout Itemize
@@ -67886,7 +68532,7 @@ tuple "list"
 
 ):
  vectorial Lagrange multiplier and initial gap,
- frame at the integration points of the primary surface;
+ both stored by their components in the frame of the current configuration at the integration points of the primary surface;
 \end_layout
 
 \begin_layout Itemize
@@ -67909,7 +68555,8 @@ tuple "list"
 
 \begin_layout Itemize
 tied-facet-on-facet:
- Lagrange multipliers and initial gap (gap_offset option),
+ Lagrange multipliers (pushed forward) and initial gap (gap_offset option;
+ frame of the current configuration),
  frame at the integration points of the primary surface;
 \end_layout
 
@@ -67951,7 +68598,7 @@ tuple "list"
 \end_inset
 
 ):
- Lagrange multipliers and initial gap,
+ Lagrange multipliers (pushed forward) and initial gap (frame of the current configuration),
  frame at the integration points of the primary surface;
 \end_layout
 
@@ -67969,7 +68616,11 @@ tuple "list"
 \end_inset
 
 ):
- initial gap and the Lagrange multipliers of the solid and viscous tractions,
+ Lagrange multipliers of the solid and viscous tractions (pushed forward) and initial gap (frame of the intermediate configuration 
+\begin_inset Formula $\mathbf{x}_{n+\alpha_{f}}$
+\end_inset
+
+),
  frame at the integration points of the primary surface;
 \end_layout
 

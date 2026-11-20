@@ -504,8 +504,11 @@ void FETiedBiphasicInterface::InitialProjection(FETiedBiphasicSurface& ss, FETie
 				// find the global location of the intersection point
 				vec3d q = ms.Local2Global(*pme, rs[0], rs[1]);
 				
-				// calculate the gap function
-				pt.m_Gap = q - r;
+				// calculate the gap function and store its components in the
+				// corotational frame of the primary surface (frame invariance)
+				FEContactFrame f;
+				f.Evaluate(ss, el, j, false);
+				pt.m_Gap = f.Rt(q - r);
 			}
 			else
 			{
@@ -563,7 +566,7 @@ void FETiedBiphasicInterface::ProjectSurface(FETiedBiphasicSurface& ss, FETiedBi
 				
 				// calculate the gap function
 				vec3d g = q - r;
-				pt.m_dg = g - pt.m_Gap;
+				pt.m_dg = g - FETiedBiphasicFrameGap(ss, el, j, pt.m_Gap);
 //                pt.m_gap = pt.m_dg.unit();
 				
 				// calculate the pressure gap function
@@ -741,6 +744,9 @@ void FETiedBiphasicInterface::LoadVector(FEGlobalVector& R, const FETimeInfo& tp
 					}
 					
 					for (k=0; k<ndof; ++k) fe[k] += N[k]*detJ[j]*w[j];
+					
+					// frame forces on the primary nodes (moment balance of the offset tie)
+					FETiedBiphasicFrameForce(fe, ss, se, j, pt.m_Gap, t, m_epsn*pt.m_epsn, detJ[j]*w[j]);
 					
 					// assemble the global residual
 					R.Assemble(en, LM, fe);
@@ -1001,6 +1007,12 @@ void FETiedBiphasicInterface::StiffnessMatrix(FELinearSystem& LS, const FETimeIn
 							ke[ndpn*(nseln+k) + 2][ndpn*(nseln+l) + 2] += eps*Hm[k]*Hm[l]*detJ[j]*w[j];
 						}
 					}
+					
+					// c. dependence of the tie on the corotational frame of the
+					//    primary surface (initial gap)
+					//-------------------------------------
+					FETiedBiphasicFrameStiffness(ke, ss, se, j, pt.m_Gap, t, eps, w[j], Hs, nseln, Hm, nmeln, ndpn,
+						(!m_bsymm) && (GetSolver()->m_msymm != REAL_SYMMETRIC));
 					
 					// b. A-term
 					//-------------------------------------

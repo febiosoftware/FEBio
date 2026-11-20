@@ -86,7 +86,6 @@ bool FEReactionRateHuiskesLazyZone::Init()
         }
         feLogInfo("Done.");
     }
-    m_binit = true;
     
     FEElasticMaterial* pem = pbm->GetSolid();
     FEElasticMixture* psm = dynamic_cast<FEElasticMixture*>(pem);
@@ -101,6 +100,8 @@ bool FEReactionRateHuiskesLazyZone::Init()
         }
     }
     if (m_comp == -1) return false;
+    
+    m_binit = true;
     
     return true;
 }

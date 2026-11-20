@@ -268,7 +268,7 @@ figs-within-sections
 \papersides 2
 \paperpagestyle default
 \tablestyle default
-\tracking_changes false
+\tracking_changes true
 \output_changes false
 \change_bars false
 \postpone_fragile_content false
@@ -88170,6 +88170,26 @@ nolink "false"
  becomes zero at that value and negative beyond it.
 \end_layout
 
+\begin_layout Standard
+The parameters 
+\family typewriter
+e0
+\family default
+,
+ 
+\family typewriter
+emax
+\family default
+ and 
+\family typewriter
+plastic_response
+\family default
+ are used to initialize the bond families when the analysis starts;
+ therefore,
+ they cannot be made time-dependent (i.e.,
+ they do not accept a load curve).
+\end_layout
+
 \begin_layout Subsubsection
 Custom Flow Curve
 \end_layout
@@ -88891,6 +88911,36 @@ Default values in FEBio are
 \end_inset
 
 .
+\end_layout
+
+\begin_layout Standard
+The parameters 
+\family typewriter
+Y0
+\family default
+,
+ 
+\family typewriter
+Ymax
+\family default
+,
+ 
+\family typewriter
+w0
+\family default
+,
+ 
+\family typewriter
+we
+\family default
+ and 
+\family typewriter
+r
+\family default
+ are used to initialize the bond families when the analysis starts;
+ therefore,
+ they cannot be made time-dependent (i.e.,
+ they do not accept a load curve).
 \end_layout
 
 \begin_layout Subsection

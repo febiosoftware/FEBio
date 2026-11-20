@@ -127,6 +127,7 @@ double FEReactionRateHuiskes::ReactionRate(FEMaterialPoint& pt)
         J = et.m_J;
     }
     sed = rpt->m_sed;
+    if (m_binit == false) Init();
     double B = m_B(pt);
     double psi0 = m_psi0(pt);
 	double zhat = B*(sed/rhor - psi0)/(J-phir)/m_M;

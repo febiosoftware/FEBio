@@ -61,7 +61,6 @@ private:
     int             m_comp;                 //!< component of solid mixture (if applicable)
     std::vector<std::vector<int>>    m_EPL; //!< list of element proximity lists
     FEMeshTopo      m_topo;                 //!< mesh topology;
-    bool            m_binit;                //!< initialization flag
     double          m_M;                    //!< molar mass of sbm
     int             m_lsbm;                 //!< local sbm value
 

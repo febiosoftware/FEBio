@@ -743,8 +743,11 @@ void FETiedMultiphasicInterface::InitialProjection(FETiedMultiphasicSurface& ss,
                 // find the global location of the intersection point
                 vec3d q = ms.Local2Global(*pme, rs[0], rs[1]);
                 
-                // calculate the gap function
-                pt.m_Gap = q - r;
+                // calculate the gap function and store its components in the
+                // corotational frame of the primary surface (frame invariance)
+                FEContactFrame f;
+                f.Evaluate(ss, el, j, false);
+                pt.m_Gap = f.Rt(q - r);
             }
             else
             {
@@ -815,7 +818,7 @@ void FETiedMultiphasicInterface::ProjectSurface(FETiedMultiphasicSurface& ss, FE
                 
                 // calculate the gap function
                 vec3d g = q - r;
-                pt.m_dg = g - pt.m_Gap;
+                pt.m_dg = g - FETiedBiphasicFrameGap(ss, el, j, pt.m_Gap);
                 
                 // calculate the pressure gap function
                 bool mporo = ms.m_poro[pme->m_lid];
@@ -1013,6 +1016,9 @@ void FETiedMultiphasicInterface::LoadVector(FEGlobalVector& R, const FETimeInfo&
                     }
                     
                     for (k=0; k<ndof; ++k) fe[k] += N[k]*detJ[j]*w[j];
+                    
+                    // frame forces on the primary nodes (moment balance of the offset tie)
+                    FETiedBiphasicFrameForce(fe, ss, se, j, pt.m_Gap, tn[j], m_epsn*pt.m_epsn, detJ[j]*w[j]);
                     
                     // assemble the global residual
                     R.Assemble(en, LM, fe);
@@ -1352,6 +1358,11 @@ void FETiedMultiphasicInterface::StiffnessMatrix(FELinearSystem& LS, const FETim
                             ke[k+2][l  ] += Kbd(2,0); ke[k+2][l+1] += Kbd(2,1); ke[k+2][l+2] += Kbd(2,2);
                         }
                     }
+                    
+                    // linearization of the initial gap rotated with the
+                    // corotational frame of the primary surface
+                    FETiedBiphasicFrameStiffness(ke, ss, se, j, pt.m_Gap, pt.m_Lmd + pt.m_dg*eps, eps, w[j], Hs, nseln, Hm, nmeln, ndpn,
+                        GetSolver()->m_msymm != REAL_SYMMETRIC);
                     
                     // --- M U L T I P H A S I C   S T I F F N E S S ---
                     if (sporo && mporo)

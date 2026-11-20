@@ -37,7 +37,7 @@ class FEBIOMIX_API FEReactionRate : public FEMaterialProperty
 {
 public:
     //! constructor
-    FEReactionRate(FEModel* pfem) : FEMaterialProperty(pfem), m_pReact(nullptr) {}
+    FEReactionRate(FEModel* pfem) : FEMaterialProperty(pfem), m_pReact(nullptr) { m_binit = false; }
     
     //! reaction rate at material point
     virtual double ReactionRate(FEMaterialPoint& pt) = 0;
@@ -52,9 +52,11 @@ public:
     virtual void ResetElementData(FEMaterialPoint& mp) {}
     virtual void InitializeElementData(FEMaterialPoint& mp) {}
     virtual void UpdateElementData(FEMaterialPoint& mp) {}
+    virtual bool Init() override { m_binit = true; }
     
 public:
     FEReaction*    m_pReact;    //!< pointer to parent reaction
+    bool    m_binit;            //!< initialization flag
 
     FECORE_BASE_CLASS(FEReactionRate)
 };

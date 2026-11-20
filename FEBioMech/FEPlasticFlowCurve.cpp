@@ -72,12 +72,12 @@ FEMaterialPointData* FEPlasticFlowCurve::CreateMaterialPointData()
 //-----------------------------------------------------------------------------
 // define the material parameters
 BEGIN_FECORE_CLASS(FEPlasticFlowCurvePaper, FEPlasticFlowCurve)
-    ADD_PARAMETER(m_Ymin   , FE_RANGE_GREATER_OR_EQUAL(0.0), "Y0"  );
-    ADD_PARAMETER(m_Ymax   , FE_RANGE_GREATER_OR_EQUAL(0.0), "Ymax");
-    ADD_PARAMETER(m_wmin   , FE_RANGE_CLOSED(0.0, 1.0)     , "w0"  );
-    ADD_PARAMETER(m_we     , FE_RANGE_CLOSED(0.0, 1.0)     , "we"  );
+    ADD_PARAMETER(m_Ymin   , FE_RANGE_GREATER_OR_EQUAL(0.0), "Y0"  )->MakeVolatile(false);
+    ADD_PARAMETER(m_Ymax   , FE_RANGE_GREATER_OR_EQUAL(0.0), "Ymax")->MakeVolatile(false);
+    ADD_PARAMETER(m_wmin   , FE_RANGE_CLOSED(0.0, 1.0)     , "w0"  )->MakeVolatile(false);
+    ADD_PARAMETER(m_we     , FE_RANGE_CLOSED(0.0, 1.0)     , "we"  )->MakeVolatile(false);
     ADD_PARAMETER(m_n      , FE_RANGE_GREATER(0)           , "nf"  );
-    ADD_PARAMETER(m_bias   , FE_RANGE_LEFT_OPEN(0.0, 1.0)  , "r"   );
+    ADD_PARAMETER(m_bias   , FE_RANGE_LEFT_OPEN(0.0, 1.0)  , "r"   )->MakeVolatile(false);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
@@ -233,9 +233,9 @@ bool FEPlasticFlowCurveUser::InitFlowCurve(FEMaterialPoint& mp)
 // define the material parameters
 BEGIN_FECORE_CLASS(FEPlasticFlowCurveMath, FEPlasticFlowCurve)
     ADD_PARAMETER(m_n      , FE_RANGE_GREATER(0)           , "nf"  );
-    ADD_PARAMETER(m_emin   , FE_RANGE_GREATER(0)           , "e0"  );
-    ADD_PARAMETER(m_emax   , FE_RANGE_GREATER(0)           , "emax");
-    ADD_PARAMETER(m_Ymath, "plastic_response")->setLongName("plastic flow curve");
+    ADD_PARAMETER(m_emin   , FE_RANGE_GREATER(0)           , "e0"  )->MakeVolatile(false);
+    ADD_PARAMETER(m_emax   , FE_RANGE_GREATER(0)           , "emax")->MakeVolatile(false);
+    ADD_PARAMETER(m_Ymath, "plastic_response")->setLongName("plastic flow curve")->MakeVolatile(false);
 END_FECORE_CLASS();
 
 //-----------------------------------------------------------------------------
