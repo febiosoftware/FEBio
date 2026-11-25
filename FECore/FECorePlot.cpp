@@ -46,6 +46,7 @@ SOFTWARE.*/
 #include <FECore/FELogFaceData.h>
 #include <FECore/FELogElemData.h>
 #include <FECore/DataRecord.h>
+#include <FECore/DataStore.h>
 
 //-----------------------------------------------------------------------------
 FEPlotParameter::FEPlotParameter(FEModel* pfem) : FEPlotData(pfem)
@@ -877,8 +878,7 @@ bool FEPlotLogElemData::SetFilter(const char* sz)
 
 	const char* szvar = it.name.c_str();
 
-	// try nodal variables first
-	m_logvar = fecore_new<FELogElemData>(szvar, fem);
+	m_logvar = DS.GetElementDataSource(szvar);
 	if (m_logvar == nullptr) return false;
 
 	if (!ApplyDataRecordItem(*m_logvar, it))

@@ -227,6 +227,7 @@ FEReactivePlasticReturnMap::Result FEReactivePlasticReturnMap::Symmetric(FEMater
     const mat3d Fe = Fs*Fusi;     // elastic predictor
 
     mat3ds Nh; Nh.zero();
+    mat3ds G0 = I;      // start of the current line search
     mat3ds G = I;
     double xi = 1;
     mat3d Fv = Fe;
@@ -234,7 +235,7 @@ FEReactivePlasticReturnMap::Result FEReactivePlasticReturnMap::Symmetric(FEMater
 
     // evaluate G, xi, Fv and the yield function for a given lam
     auto evaluate = [&](double lam) {
-        G = I - Nh*lam;
+        G = G0 - Nh*lam;
         // xi enforces det(Fvs) = 1 when plastic deformation is isochoric (Eq. 3.19)
         xi = m_isochrc ? pow((Fusi*G).det(), -1./3.) : 1.0;
         Fv = Fe*G*xi;
@@ -243,33 +244,60 @@ FEReactivePlasticReturnMap::Result FEReactivePlasticReturnMap::Symmetric(FEMater
         return Kv - Ky;
     };
 
-    // flow direction, evaluated at the elastic predictor
     double phi = evaluate(0);
-    if (mandel) {
-        // classical associated flow: normal to the yield surface in Mandel stress space
-        mat3ds dPhi = m_pCrit->CriterionStressTangent(pt);
-        Nh = (Fv.inverse()*dPhi*Fv).sym();
-    }
-    else {
-        // normal to the yield surface with respect to G, i.e., dPhi = Nh : dG
-        mat3d M = YieldStressTangent(pt);
-        Nh = (Fv.transpose()*M*Fv.transpose().inverse()).sym();
-    }
-    double Nmag = Nh.norm();
-    bool conv = false;
-    double lam = 0;
-    if (Nmag > 0) {
+    bool conv = (fabs(phi) <= tol);
+
+    // Line searches along the flow direction Nh, G = G0 - lam*Nh. With mandel = true the
+    // flow direction is the yield surface normal at the elastic predictor (single search).
+    // Otherwise Nh = dPhi/dG is the steepest descent direction of phi with respect to G; if
+    // phi = 0 cannot be reached along it, it is re-evaluated at the closest iterate and the
+    // search is repeated, so that the return map converges (or reaches a minimum of phi)
+    // within this call. Stopping after a single search would leave phi > 0 and continue to
+    // produce plastic flow at every subsequent evaluation, even at fixed deformation.
+    // The first search is the same as in a single-search return map, and G remains symmetric.
+    const int maxpass = mandel ? 1 : 20;
+    for (int pass = 0; (pass < maxpass) && !conv; ++pass)
+    {
+        // flow direction, evaluated at the current state
+        if (mandel) {
+            // classical associated flow: normal to the yield surface in Mandel stress space
+            mat3ds dPhi = m_pCrit->CriterionStressTangent(pt);
+            Nh = (Fv.inverse()*dPhi*Fv).sym();
+        }
+        else {
+            // normal to the yield surface with respect to G, i.e., dPhi = Nh : dG
+            // (for G = I this is sym(Fv^T*M*Fv^-T), since xi is a scalar)
+            mat3d M = YieldStressTangent(pt);
+            mat3ds Gi = G.inverse();
+            Nh = (Fe.transpose()*M*Fe.transpose().inverse()*Gi).sym();
+            // in subsequent searches, include the variation of xi with G, so that
+            // Nh is the exact gradient on the isochoric manifold (Nh : G = 0)
+            if (m_isochrc && (pass > 0)) Nh -= Gi*(M.trace()/3.);
+        }
+        double Nmag = Nh.norm();
+        if (Nmag <= 0) break;
         Nh = Nh/Nmag;
 
-        // G must remain positive definite
+        // G = G0 - lam*Nh must remain positive definite: lam < 1/emax, where emax is the
+        // largest eigenvalue of G0^-1/2*Nh*G0^-1/2
+        mat3ds Nr = Nh;
+        if (pass > 0) {
+            double d[3]; vec3d r[3];
+            G0.eigen(d, r);
+            mat3ds Gis; Gis.zero();
+            for (int k=0; k<3; ++k) Gis += dyad(r[k])/sqrt(d[k]);
+            Nr = (Gis*Nh*Gis).sym();
+        }
         double ev[3];
-        Nh.eigen2(ev);
+        Nr.eigen2(ev);
         double emax = ev[0];
         if (ev[1] > emax) emax = ev[1];
         if (ev[2] > emax) emax = ev[2];
 
         // safeguarded Newton iterations on phi(lam) along the fixed flow direction,
         // bracketing the root in [lo, hi] and falling back to bisection
+        double lam = 0;
+        double phi0 = phi;
         double lo = 0;
         bool hasHi = (emax > 0);
         double hi = hasHi ? (1 - 1e-6)/emax : 0;
@@ -305,6 +333,11 @@ FEReactivePlasticReturnMap::Result FEReactivePlasticReturnMap::Symmetric(FEMater
             lam = lbest;
             phi = evaluate(lam);
         }
+
+        // start the next search from the current iterate; stop when the search
+        // no longer reduces phi by more than the tolerance (minimum of phi reached)
+        G0 = G;
+        if (fabs(phi0) - fabs(phi) <= tol) break;
     }
 
     // restore the total deformation gradient

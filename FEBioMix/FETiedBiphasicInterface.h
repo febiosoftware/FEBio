@@ -34,7 +34,7 @@ SOFTWARE.*/
 class FEBIOMIX_API FETiedBiphasicContactPoint: public FEBiphasicContactPoint
 {
 public:
-    vec3d   m_Gap;  //!< initial gap in reference configuration
+    vec3d   m_Gap;  //!< initial gap (components in the current corotational frame of the primary surface)
     vec3d   m_dg;   //!< gap function at integration points
     vec3d   m_nu;   //!< normal at integration points
     vec2d   m_rs;   //!< natural coordinates of projection of integration point
@@ -56,11 +56,15 @@ public:
 };
 
 //-----------------------------------------------------------------------------
-//! The initial gap m_Gap and the Lagrange multipliers m_Lmd are stored as spatial
-//! vectors. At the start of each time step they are pushed forward with the
-//! rotation of the interface (corotational frame at the primary integration
-//! point) over the previous time step, so that they remain frame invariant.
-//! If binit is true, the frames are only initialized.
+//! The Lagrange multipliers m_Lmd are stored as spatial vectors. At the start of
+//! each time step they are pushed forward with the rotation of the interface
+//! (corotational frame at the primary integration point) over the previous time
+//! step, so that they remain frame invariant. If binit is true, the frames are
+//! only initialized.
+//! The initial gap m_Gap is NOT pushed forward here: it is stored by its
+//! components in the corotational frame and rotated with the frame evaluated in
+//! the current configuration (see FETiedBiphasicFrameGap), since holding it fixed
+//! within a time step produces spurious, step-size dependent tractions.
 inline void FETiedBiphasicPushForward(FESurface& ss, bool binit)
 {
     for (int i = 0; i < ss.Elements(); ++i)
@@ -73,13 +77,71 @@ inline void FETiedBiphasicPushForward(FESurface& ss, bool binit)
             if (pt.m_pme == nullptr) continue;
             FEContactFrame Rn;
             Rn.Evaluate(ss, se, j, true);
-            vec3d v[2] = { pt.m_Gap, pt.m_Lmd };
-            pt.m_Rp.Update(Rn, v, 2);
-            pt.m_Gap = v[0];
-            pt.m_Lmd = v[1];
+            pt.m_Rp.Update(Rn, &pt.m_Lmd, 1);
         }
     }
 }
+
+//! Current image R.Gap of the initial gap stored in the corotational frame of
+//! the primary surface (current configuration)
+inline vec3d FETiedBiphasicFrameGap(FESurface& ss, FESurfaceElement& se, int j, const vec3d& Gap)
+{
+    FEContactFrame f;
+    f.Evaluate(ss, se, j, false);
+    return f.R(Gap);
+}
+
+//! Frame forces on the primary nodes of a tied point with an initial gap stored in
+//! the corotational frame (gap function dg = (x2 - x1) - R.Gap, traction t =
+//! Lm + eps*dg, nodal forces integrated over the current area, W = detJ*w).
+//! These balance the moment of the traction pair (see FETiedFrameOffset).
+//! fe holds 3 displacement dofs per node, primary nodes first.
+inline void FETiedBiphasicFrameForce(std::vector<double>& fe, FESurface& ss, FESurfaceElement& se, int j,
+    const vec3d& Gap, const vec3d& t, double eps, double W)
+{
+    if (Gap.norm2() == 0.0) return;
+    FETiedFrameOffset fo; vec3d g1, g2; double sgn;
+    fo.R.Evaluate(ss, se, j, false, g1, g2, sgn);
+    fo.EvalSpatial(g1, g2, Gap, t, eps);
+    double* Gr = se.Gr(j);
+    double* Gs = se.Gs(j);
+    for (int k = 0; k < se.Nodes(); ++k)
+    {
+        double T[2] = { sgn*Gr[k], sgn*Gs[k] };
+        vec3d f = fo.Force(T, W);
+        fe[3*k] += f.x; fe[3*k+1] += f.y; fe[3*k+2] += f.z;
+    }
+}
+
+//! Tangent of the dependence of the tie on the corotational frame of the primary
+//! surface (gap function dg = (x2 - x1) - R.Gap, traction t = Lm + eps*dg). This adds
+//! the frame-dependent part of the Hessian of psi = Lm.dg + eps/2 dg.dg (symmetric),
+//! and, if bareaterm is true, the (non-symmetric) term due to the variation of the
+//! current area in the frame forces. The I-term eps*N_a*N_b and the area term of
+//! the N_a*t forces are evaluated by the caller.
+//! ndpn is the number of dofs per node in ke (displacements first).
+template <class MAT>
+inline void FETiedBiphasicFrameStiffness(MAT& ke, FESurface& ss, FESurfaceElement& se, int j,
+    const vec3d& Gap, const vec3d& t, double eps, double w, const double* Hs, int nseln, const double* Hm, int nmeln,
+    int ndpn, bool bareaterm)
+{
+    if (Gap.norm2() == 0.0) return;
+    FETiedFrameOffset fo; vec3d g1, g2; double sgn;
+    fo.R.Evaluate(ss, se, j, false, g1, g2, sgn);
+    fo.EvalSpatial(g1, g2, Gap, t, eps);
+    vec3d gc[2];
+    ss.CoBaseVectors(se, j, gc);
+    double W = (gc[0] ^ gc[1]).norm()*w;
+    double* Gr = se.Gr(j);
+    double* Gs = se.Gs(j);
+    const int MN = FEElement::MAX_NODES;
+    int off[2*MN]; double Y[2*MN]; double T[2*MN][2];
+    for (int a = 0; a < nseln; ++a) { off[a] = ndpn*a; Y[a] = -Hs[a]; T[a][0] = sgn*Gr[a]; T[a][1] = sgn*Gs[a]; }
+    for (int b = 0; b < nmeln; ++b) { off[nseln+b] = ndpn*(nseln+b); Y[nseln+b] = Hm[b]; T[nseln+b][0] = T[nseln+b][1] = 0.0; }
+    FEContactFrame::AddHessian(ke, nseln + nmeln, off, Y, T, eps, false, fo.Hyg, fo.Hgg, W);
+    if (bareaterm) fo.AddAreaTangent(ke, nseln, off, T, gc[0], gc[1], Gr, Gs, w, 1.0);
+}
+
 
 //-----------------------------------------------------------------------------
 class FEBIOMIX_API FETiedBiphasicSurface : public FEBiphasicContactSurface

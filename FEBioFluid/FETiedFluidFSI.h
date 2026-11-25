@@ -106,7 +106,7 @@ public:
         void Init() override;
 
     public:
-        vec3d    m_Gap;     //!< initial gap in reference configuration
+        vec3d    m_Gap;     //!< initial gap (components in the corotational frame of the primary surface)
         vec3d    m_dg;      //!< vectorial gap g at integration points
         vec3d    m_gw;      //!< relative fluid velocity gap: w(2) - w(1) against an FSI
                             //!< surface, -w(1) against a solid wall (no-slip, Sec. 7.10)
@@ -122,7 +122,7 @@ public:
         double   m_epss;    //!< solid traction penalty factor
         double   m_epst;    //!< viscous traction penalty factor
         double   m_epsn;    //!< dilatation penalty factor
-        FEContactFrame m_Rp; //!< corotational frame at start of time step (for pushing m_Gap, m_Lmd, m_Lmt forward)
+        FEContactFrame m_Rp; //!< corotational frame at start of time step (for pushing m_Lmd, m_Lmt forward)
     };
 
     //! constructor

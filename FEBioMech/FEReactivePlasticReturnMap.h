@@ -59,7 +59,8 @@ public:
 
     // symmetric formulation: (Fvs)^-1 = xi*(Fus)^-1*G, G = I - lam*Nhat, Fv = xi*Fe*G,
     // without polar decomposition. If mandel is true, Nhat is normal to the yield surface
-    // in Mandel stress space (classical associated flow); otherwise Nhat = dPhi/dG.
+    // in Mandel stress space (classical associated flow); otherwise Nhat = dPhi/dG, which is
+    // re-evaluated (G = G0 - lam*Nhat) until phi = 0 or phi stops decreasing.
     Result Symmetric(FEMaterialPoint& pt, const mat3d& Fs, const mat3d& Fusi, double Ky, bool mandel);
 
     // get the tensor M such that dPhi = M : L, where L = dF*F^-1 (Eq. 3.27)

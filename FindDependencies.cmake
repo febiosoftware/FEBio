@@ -289,12 +289,22 @@ else()
 		DOC "PDL library path")
 endif()	
 
-if(PDL_LIB)		
+if(PDL_LIB)
 	option(USE_PDL "Required for pardiso-project use" ON)
     mark_as_advanced(PDL_LIB)
 else()
 	option(USE_PDL "Required for pardiso-project use" OFF)
     mark_as_advanced(CLEAR PDL_LIB)
+endif()
+
+# Load pardiso-project at run time instead of linking it, so a single build
+# works with or without a Panua license (takes precedence over USE_PDL).
+if(NOT WIN32)
+    if(APPLE)
+        option(PDL_RUNTIME_LOAD "Load pardiso-project with dlopen at run time instead of linking it" ON)
+    else()
+        option(PDL_RUNTIME_LOAD "Load pardiso-project with dlopen at run time instead of linking it" OFF)
+    endif()
 endif()
 
 # ZLIB

@@ -868,12 +868,15 @@ void FETiedFluidFSI::PrepStep()
 }
 
 //-----------------------------------------------------------------------------
-//! The initial gap m_Gap and the Lagrange multipliers m_Lmd, m_Lmt are stored as
-//! spatial vectors. At the start of each time step they are pushed forward with
-//! the rotation of the interface (corotational frame at the integration point, in
-//! the configuration at the start of the time step) over the previous time step,
-//! so that they remain frame invariant. If binit is true, the frames are only
-//! initialized.
+//! The Lagrange multipliers m_Lmd, m_Lmt are stored as spatial vectors. At the
+//! start of each time step they are pushed forward with the rotation of the
+//! interface (corotational frame at the integration point, in the configuration at
+//! the start of the time step) over the previous time step, so that they remain
+//! frame invariant. If binit is true, the frames are only initialized.
+//! The initial gap m_Gap is not pushed forward here: it is stored by its components
+//! in the corotational frame and rotated in ProjectSurface with the frame of the
+//! configuration in which the gap is evaluated (holding it fixed within a time step
+//! produces spurious, step-size dependent tractions).
 void FETiedFluidFSI::PushForward(FETiedFluidFSISurface& ss, bool binit)
 {
     for (int i = 0; i < ss.Elements(); ++i)
@@ -886,11 +889,10 @@ void FETiedFluidFSI::PushForward(FETiedFluidFSISurface& ss, bool binit)
             if (pt.m_pme == nullptr) continue;
             FEContactFrame Rn;
             Rn.Evaluate(ss, se, j, true);
-            vec3d v[3] = { pt.m_Gap, pt.m_Lmd, pt.m_Lmt };
-            pt.m_Rp.Update(Rn, v, 3);
-            pt.m_Gap = v[0];
-            pt.m_Lmd = v[1];
-            pt.m_Lmt = v[2];
+            vec3d v[2] = { pt.m_Lmd, pt.m_Lmt };
+            pt.m_Rp.Update(Rn, v, 2);
+            pt.m_Lmd = v[0];
+            pt.m_Lmt = v[1];
         }
     }
 }
@@ -1123,8 +1125,11 @@ void FETiedFluidFSI::InitialProjection(FETiedFluidFSISurface& ss, FETiedFluidFSI
                 // find the global location of the intersection point
                 vec3d q = ms.Local2Global(*pme, rs[0], rs[1]);
 
-                // calculate the gap function
-                pt.m_Gap = q - r;
+                // calculate the gap function and store its components in the
+                // corotational frame of the primary surface (frame invariance)
+                FEContactFrame f;
+                f.Evaluate(ss, el, j, false);
+                pt.m_Gap = f.Rt(q - r);
                 ++nproj;
                 maxgap = max(maxgap, pt.m_Gap.norm());
             }
@@ -1227,8 +1232,14 @@ void FETiedFluidFSI::ProjectSurface(FETiedFluidFSISurface& ss, FETiedFluidFSISur
                 // find the global location of the intersection point
                 vec3d q = ms.Local2GlobalAlpha(*pme, pt.m_rs[0], pt.m_rs[1], alpha);
 
-                // solid displacement gap, measured from the initial gap
-                pt.m_dg = (q - r) - pt.m_Gap;
+                // solid displacement gap, measured from the initial gap rotated with
+                // the corotational frame of the primary surface, evaluated in the same
+                // (intermediate) configuration as r and q (frame invariant)
+                vec3d ga[2];
+                ss.CoBaseVectorsAlpha(el, j, alpha, ga);
+                FEContactFrame f;
+                f.Set(ga[0], ga[1]);
+                pt.m_dg = (q - r) - f.R(pt.m_Gap);
 				pt.m_gap = pt.m_dg.norm();
 
                 // relative fluid velocity and dilatation gaps
@@ -1450,6 +1461,29 @@ void FETiedFluidFSI::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
                         }
 
                         ms.m_Fn[se2.m_lnode[b]] += s2v[b]*(detJ[j]*w[j]);
+                    }
+
+                    // Frame forces on the primary u dofs. The solid gap is measured from the
+                    // initial gap rotated with the corotational frame R of the primary surface,
+                    // which depends on the primary nodal positions; these forces balance the
+                    // moment of the solid traction pair (see FETiedFrameOffset).
+                    if (pt.m_Gap.norm2() > 0.0)
+                    {
+                        vec3d ga[2];
+                        ss.CoBaseVectorsAlpha(se1, j, tp.alphaf, ga);
+                        FETiedFrameOffset fo;
+                        fo.EvalSpatial(ga[0], ga[1], pt.m_Gap, pt.m_ts, m_epss*pt.m_epss);
+                        double* Gr1 = se1.Gr(j);
+                        double* Gs1 = se1.Gs(j);
+                        for (int a=0; a<neln1; ++a)
+                        {
+                            double T[2] = { Gr1[a], Gs1[a] };
+                            vec3d f = fo.Force(T, detJ[j]*w[j]);
+                            fe[ndpn1*a    ] += f.x;
+                            fe[ndpn1*a + 1] += f.y;
+                            fe[ndpn1*a + 2] += f.z;
+                            ss.m_Fn[se1.m_lnode[a]] += f;
+                        }
                     }
 
                     // assemble the global residual
@@ -1747,6 +1781,25 @@ void FETiedFluidFSI::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp)
                                 ke[off2 + ndpn2*b + 6][off2 + ndpn2*d + 6] -= k22;
                             }
                         }
+                    }
+
+                    //------------------------------------
+                    // Dependence of the solid tie on the corotational frame R of the primary
+                    // surface (intermediate configuration), through the initial gap R.Gap:
+                    // the frame-dependent part of the Hessian of psi = Lmd.dg + epss/2 dg.dg
+                    // (symmetric), and the variation of the current area in the frame forces
+                    // (non-symmetric; omitted for symmetric stiffness). All derivatives with
+                    // respect to the end-of-step positions carry the factor alpha.
+                    if (pt.m_Gap.norm2() > 0.0)
+                    {
+                        FETiedFrameOffset fo;
+                        fo.EvalSpatial(gtan[j][0], gtan[j][1], pt.m_Gap, ts, epss);
+                        int off[2*MN]; double Y[2*MN]; double T[2*MN][2];
+                        for (int a=0; a<neln1; ++a) { off[a] = ndpn1*a; Y[a] = -H1[a]; T[a][0] = Gr1[a]; T[a][1] = Gs1[a]; }
+                        for (int b=0; b<neln2; ++b) { off[neln1+b] = off2 + ndpn2*b; Y[neln1+b] = H2[b]; T[neln1+b][0] = T[neln1+b][1] = 0.0; }
+                        FEContactFrame::AddHessian(ke, neln1+neln2, off, Y, T, epss, false, fo.Hyg, fo.Hgg, alpha*Jw);
+                        if (!m_bsymm && (GetSolver()->m_msymm != REAL_SYMMETRIC))
+                            fo.AddAreaTangent(ke, neln1, off, T, gtan[j][0], gtan[j][1], Gr1, Gs1, w[j], alpha);
                     }
 
                     // assemble the global stiffness

@@ -114,21 +114,25 @@ double FELinearSpring::strainEnergy(double dl)
 // define the material parameters
 BEGIN_FECORE_CLASS(FETensionOnlyLinearSpring, FESpringMaterial)
 	ADD_PARAMETER(m_E, FE_RANGE_GREATER(0.0), "E");
+	ADD_PARAMETER(m_slack_length, FE_RANGE_GREATER_OR_EQUAL(0.0), "slack_length");
 END_FECORE_CLASS();
 
 double FETensionOnlyLinearSpring::force(double dl)
 {
-	if (dl >= 0) return m_E*dl; else return 0;
+	double extension = dl - m_slack_length;
+	if (extension >= 0) return m_E*extension; else return 0;
 }
 
 double FETensionOnlyLinearSpring::stiffness(double dl)
 {
-	return (dl >= 0 ? m_E : 0);
+	double extension = dl - m_slack_length;
+	return (extension >= 0 ? m_E : 0);
 }
 
 double FETensionOnlyLinearSpring::strainEnergy(double dl)
 {
-	if(dl >= 0) return m_E*dl*dl/2; else return 0;
+	double extension = dl - m_slack_length;
+	if(extension >= 0) return m_E*extension*extension/2; else return 0;
 }
 
 //-----------------------------------------------------------------------------

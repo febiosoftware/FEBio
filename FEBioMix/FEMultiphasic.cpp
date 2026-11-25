@@ -44,7 +44,7 @@ using namespace std;
 BEGIN_FECORE_CLASS(FEMultiphasic, FEMaterial)
 	ADD_PARAMETER(m_phi0   , FE_RANGE_CLOSED     (0.0, 1.0), "phi0"         );
 	ADD_PARAMETER(m_rhoTw  , FE_RANGE_GREATER_OR_EQUAL(0.0), "fluid_density");
-	ADD_PARAMETER(m_penalty, FE_RANGE_GREATER_OR_EQUAL(0.0), "penalty"      );
+	ADD_PARAMETER(m_penalty, FE_RANGE_GREATER_OR_EQUAL(0.0), "penalty"      )->SetFlags(FE_PARAM_HIDDEN);
 	ADD_PARAMETER(m_cFr    , "fixed_charge_density");
 
 	// define the material properties
@@ -215,12 +215,13 @@ void FEMultiphasic::Serialize(DumpStream& ar)
 //! Solid referential apparent density
 double FEMultiphasic::SolidReferentialApparentDensity(FEMaterialPoint& pt)
 {
-	FEBiphasicMaterialPoint& pet = *pt.ExtractData<FEBiphasicMaterialPoint>();
 	FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
 		
 	// evaluate referential apparent density of base solid
+	// (use the base solid volume fraction only; m_phi0t also includes
+	// solid-bound molecules and solutes, whose mass is added separately)
 	double density = m_pSolid->Density(pt);
-	double rhosr = pet.m_phi0t*density;
+	double rhosr = m_phi0(pt)*density;
 
 	// add contribution from solid-bound molecules
 	for (int isbm=0; isbm<(int)spt.m_sbmr.size(); ++isbm)
@@ -240,10 +241,17 @@ double FEMultiphasic::GetReferentialSolidVolumeFraction(const FEMaterialPoint& p
 //! Evaluate and return solid referential volume fraction
 double FEMultiphasic::SolidReferentialVolumeFraction(FEMaterialPoint& pt)
 {
-	// get referential apparent density of base solid (assumed constant)
+	// get referential volume fraction of base solid (assumed constant)
 	double phisr = m_phi0(pt);
     
+	// add contribution from solid-bound molecules
+	for (int isbm=0; isbm<(int)m_pSBM.size(); ++isbm)
+		phisr += SBMReferentialVolumeFraction(pt, isbm);
+    
     // add contribution from solid-bound 'solutes'
+    // their referential volume fraction is (J - phisr)*f, where phisr includes
+    // the base solid, solid-bound molecules and the solid-bound solutes, thus
+    // phisr = phib + (J - phisr)*f  =>  phisr = (phib + J*f)/(1+f)
     FEElasticMaterialPoint& et = *pt.ExtractData<FEElasticMaterialPoint>();
     FESolutesMaterialPoint& spt = *pt.ExtractData<FESolutesMaterialPoint>();
     const int nsol = (int)m_pSolute.size();
@@ -251,10 +259,6 @@ double FEMultiphasic::SolidReferentialVolumeFraction(FEMaterialPoint& pt)
     for (int isol=0; isol<nsol; ++isol)
         if (spt.m_bsb[isol]) f += spt.m_ca[isol]*m_pSolute[isol]->MolarMass()/m_pSolute[isol]->Density();
     phisr = (phisr + et.m_J*f)/(1+f);
-    
-	// add contribution from solid-bound molecules
-	for (int isbm=0; isbm<(int)m_pSBM.size(); ++isbm)
-		phisr += SBMReferentialVolumeFraction(pt, isbm);
     
     FEBiphasicMaterialPoint& bt = *pt.ExtractData<FEBiphasicMaterialPoint>();
     bt.m_phi0t = phisr;
@@ -283,15 +287,19 @@ double FEMultiphasic::TangentSRVFStrain(FEMaterialPoint& pt)
             s += spt.m_ca[isol]*m_pSolute[isol]->MolarMass()/m_pSolute[isol]->Density()*spt.m_dkdJ[isol]/spt.m_k[isol];
         }
     }
-    double d = 1+f;
-    double dphisrdJ = f/d + (J-phis0)*s/(d*d);
     
     // add contribution from solid-bound molecules
-    f = s = 0;
+    // (assuming their concentrations per fluid volume remain constant, their
+    // referential volume fraction is (J - phisr)*g)
+    double phisbm = 0;
     for (int isbm=0; isbm<(int)m_pSBM.size(); ++isbm) {
-        f += spt.m_sbmr[isbm]/m_pSBM[isbm]->Density();
+        phisbm += spt.m_sbmr[isbm]/m_pSBM[isbm]->Density();
     }
-    dphisrdJ += f/(J-phisr + f);
+    double g = phisbm/(J-phisr);
+    
+    // phisr = (phis0 + J*(f+g))/(1+f+g)
+    double d = 1+f+g;
+    double dphisrdJ = (f+g)/d + (J-phis0)*s/(d*d);
     
     return dphisrdJ;
 }

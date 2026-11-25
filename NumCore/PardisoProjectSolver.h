@@ -30,6 +30,7 @@ SOFTWARE.*/
 #include <FECore/LinearSolver.h>
 #include <FECore/CompactUnSymmMatrix.h>
 #include <FECore/CompactSymmMatrix.h>
+#include <string>
 
 //! This Pardiso solver can be installed as a shared object library from
 //!		http://www.pardiso-project.org
@@ -53,6 +54,11 @@ public:
 	double condition_number();
 
 	void UseIterativeFactorization(bool b);
+
+	// true if the Panua library can be used (always true when linked at build
+	// time; when loaded at run time, the library must be found and licensed)
+	static bool IsAvailable();
+	static std::string UnavailableReason();
 
 protected:
 

@@ -91,6 +91,23 @@ NUMCORE_API void NumCore::InitModule()
 	FECoreKernel& fecore = FECoreKernel::GetInstance();
 #ifdef PARDISO
 	fecore.SetDefaultSolverType("pardiso");
+#elif defined(PARDISODL_RUNTIME)
+	// Use Panua Pardiso if the user has installed and licensed it, otherwise
+	// fall back to Accelerate (macOS) or skyline.
+	if (PardisoProjectSolver::IsAvailable())
+		fecore.SetDefaultSolverType("pardiso-project");
+	else
+	{
+#ifdef __APPLE__
+		fecore.SetDefaultSolverType("accelerate");
+#else
+		fecore.SetDefaultSolverType("skyline");
+#endif
+	}
+#elif defined(PARDISODL)
+	fecore.SetDefaultSolverType("pardiso-project");
+#elif defined(__APPLE__)
+	fecore.SetDefaultSolverType("accelerate");
 #else
 	fecore.SetDefaultSolverType("skyline");
 #endif

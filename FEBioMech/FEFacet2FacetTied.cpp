@@ -298,7 +298,16 @@ void FEFacet2FacetTied::Activate()
 				// get integration point data
 				FEFacetTiedSurface::Data& pt = static_cast<FEFacetTiedSurface::Data&>(*se.GetMaterialPoint(j));
 
-				pt.m_vgap0 = pt.m_vgap;
+				// store the initial gap by its components in the corotational
+				// frame of the primary surface (current configuration), so that
+				// it rotates with the interface (frame invariance)
+				if (pt.m_pme)
+				{
+					FEContactFrame f;
+					f.Evaluate(m_ss, se, j, false);
+					pt.m_vgap0 = f.Rt(pt.m_vgap);
+				}
+				else pt.m_vgap0 = vec3d(0, 0, 0);
 				pt.m_vgap = vec3d(0, 0, 0);
 				pt.m_gap = 0.0;
 			}
@@ -319,10 +328,11 @@ void FEFacet2FacetTied::Activate()
 }
 
 //-----------------------------------------------------------------------------
-//! The initial gap and the Lagrange multipliers are stored as spatial vectors.
-//! At the start of each time step they are pushed forward with the rotation of
-//! the interface (local corotational frame) over the previous time step, so
-//! that they remain frame invariant.
+//! The Lagrange multipliers are stored as spatial vectors. At the start of each
+//! time step they are pushed forward with the rotation of the interface (local
+//! corotational frame) over the previous time step, so that they remain frame
+//! invariant. (The initial gap m_vgap0 is stored by its components in the
+//! corotational frame and is rotated with the current frame in Update().)
 void FEFacet2FacetTied::PrepStep()
 {
 	FEContactInterface::PrepStep();
@@ -336,10 +346,7 @@ void FEFacet2FacetTied::PrepStep()
 			if (pt.m_pme == nullptr) continue;
 			FEContactFrame Rn;
 			Rn.Evaluate(m_ss, se, j, true);
-			vec3d v[2] = { pt.m_vgap0, pt.m_Lm };
-			pt.m_Rp.Update(Rn, v, 2);
-			pt.m_vgap0 = v[0];
-			pt.m_Lm = v[1];
+			pt.m_Rp.Update(Rn, &pt.m_Lm, 1);
 		}
 	}
 }
@@ -457,8 +464,16 @@ void FEFacet2FacetTied::Update()
 				// calculate the primary node projection
 				vec3d q = me.eval(y, r, s);
 
-				// calculate the gap function
-				pt.m_vgap = (rn - q) - pt.m_vgap0;
+				// calculate the gap function, relative to the initial gap rotated
+				// with the current corotational frame (frame invariant)
+				vec3d G0(0, 0, 0);
+				if (m_gapoff)
+				{
+					FEContactFrame f;
+					f.Evaluate(m_ss, se, n, false);
+					G0 = f.R(pt.m_vgap0);
+				}
+				pt.m_vgap = (rn - q) - G0;
 
 				pt.m_gap = pt.m_vgap.norm();
 			}
@@ -543,6 +558,27 @@ void FEFacet2FacetTied::LoadVector(FEGlobalVector& R, const FETimeInfo& tp)
 					fe[3*(k+nseln)+2] = detJ*w[n]*tc.z*Hm[k];
 				}
 
+				// With a gap offset, the gap is vgap = (x1 - x2) - R.G0, where the frame R
+				// depends on the primary nodal positions. The forces then also include
+				// the frame forces on the primary nodes (see FETiedFrameOffset), which
+				// balance the moment of the traction pair and make the tie variational.
+				if (m_gapoff)
+				{
+					FETiedFrameOffset fo; vec3d g1, g2; double sgn;
+					fo.R.Evaluate(m_ss, se, n, false, g1, g2, sgn);
+					fo.EvalSpatial(g1, g2, pt.m_vgap0, tc, m_eps);
+					double* Gr = se.Gr(n);
+					double* Gs = se.Gs(n);
+					for (int k=0; k<nseln; ++k)
+					{
+						double T[2] = { sgn*Gr[k], sgn*Gs[k] };
+						vec3d f = fo.Force(T, detJ*w[n]);
+						fe[3*k  ] += f.x;
+						fe[3*k+1] += f.y;
+						fe[3*k+2] += f.z;
+					}
+				}
+
 				// build the LM vector
 				LM.resize(ndof);
 				for (int k=0; k<nseln; ++k)
@@ -625,43 +661,35 @@ void FEFacet2FacetTied::StiffnessMatrix(FELinearSystem& LS, const FETimeInfo& tp
 				// calculate degrees of freedom
 				int ndof = 3*(nseln + nmeln);
 
-				// create the stiffness matrix
+				// create the stiffness matrix: the Hessian of the potential
+				//   detJ*w*psi,  psi = Lm.vgap + eps/2 vgap.vgap,  vgap = y - R.G0,  y = x1 - x2
+				// (Lm is held fixed during the iterations), with dy/dx1_a = N_a I,
+				// dy/dx2_b = -N_b I and, for a gap offset, dG_k/dx1_a = sgn*dN_a/dr_k I
+				// for the base vectors G_k that define the corotational frame R.
 				ke.resize(ndof, ndof);
 				ke.zero();
-				for (int k=0; k<nseln; ++k)
 				{
-					for (int l=0; l<nseln; ++l)
+					const int MN = FEElement::MAX_NODES;
+					int off[2*MN]; double Y[2*MN]; double T[2*MN][2];
+					FETiedFrameOffset fo;
+					double sgn = 1.0;
+					double* Gr = se.Gr(n);
+					double* Gs = se.Gs(n);
+					if (m_gapoff)
 					{
-						ke[3*k  ][3*l  ] = Hs[k]*Hs[l];
-						ke[3*k+1][3*l+1] = Hs[k]*Hs[l];
-						ke[3*k+2][3*l+2] = Hs[k]*Hs[l];
+						vec3d g1, g2;
+						fo.R.Evaluate(m_ss, se, n, false, g1, g2, sgn);
+						vec3d tc = pt.m_Lm + pt.m_vgap*m_eps;
+						fo.EvalSpatial(g1, g2, pt.m_vgap0, tc, m_eps);
 					}
+					else
+					{
+						for (int k=0; k<2; ++k) { fo.Hyg[k].zero(); for (int l=0; l<2; ++l) fo.Hgg[k][l].zero(); }
+					}
+					for (int a=0; a<nseln; ++a) { off[a] = 3*a; Y[a] = Hs[a]; T[a][0] = (m_gapoff ? sgn*Gr[a] : 0.0); T[a][1] = (m_gapoff ? sgn*Gs[a] : 0.0); }
+					for (int b=0; b<nmeln; ++b) { off[nseln+b] = 3*(nseln+b); Y[nseln+b] = -Hm[b]; T[nseln+b][0] = T[nseln+b][1] = 0.0; }
+					FEContactFrame::AddHessian(ke, nseln+nmeln, off, Y, T, m_eps, true, fo.Hyg, fo.Hgg, detJ*w[n]);
 				}
-
-				for (int k=0; k<nseln; ++k)
-				{
-					for (int l=0; l<nmeln; ++l)
-					{
-						ke[3*k  ][3*(l+nseln)  ] = -Hs[k]*Hm[l];
-						ke[3*k+1][3*(l+nseln)+1] = -Hs[k]*Hm[l];
-						ke[3*k+2][3*(l+nseln)+2] = -Hs[k]*Hm[l];
-
-						ke[3*(l+nseln)  ][3*k  ] = -Hs[k]*Hm[l];
-						ke[3*(l+nseln)+1][3*k+1] = -Hs[k]*Hm[l];
-						ke[3*(l+nseln)+2][3*k+2] = -Hs[k]*Hm[l];
-					}
-				}
-
-				for (int k=0; k<nmeln; ++k)
-					for (int l=0; l<nmeln; ++l)
-					{
-						ke[3*(k+nseln)  ][3*(l+nseln)  ] = Hm[k]*Hm[l];
-						ke[3*(k+nseln)+1][3*(l+nseln)+1] = Hm[k]*Hm[l];
-						ke[3*(k+nseln)+2][3*(l+nseln)+2] = Hm[k]*Hm[l];
-					}
-
-				for (int k=0; k<ndof; ++k)
-					for (int l=0; l<ndof; ++l) ke[k][l] *= m_eps*detJ*w[n];
 
 				// build the LM vector
 				LM.resize(ndof);

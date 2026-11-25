@@ -50,6 +50,9 @@ public:
 	
 	//! tangent of solute supply with respect to referential density
 	double Tangent_Supply_Density(FEMaterialPoint& mp) override;
+
+    //! sum of proximity weights used to normalize the nonlocal supply
+    double ProximityWeight(FEMaterialPoint& pt);
 	
 public:
 	double	m_B;			//!< mass supply coefficient

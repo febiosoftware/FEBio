@@ -76,6 +76,7 @@ public:
 
 public:
 	double m_E = 0; //!< spring constant
+	double m_slack_length = 0; //!< slack length
 
 	// declare the parameter list
 	DECLARE_FECORE_CLASS();
