@@ -32,7 +32,9 @@ SOFTWARE.*/
 #include "FECoreKernel.h"
 #include "FEModelParam.h"
 #include "log.h"
+#include "xmltool.h"
 #include <sstream>
+#include <cstring>
 
 //-----------------------------------------------------------------------------
 //! The constructor takes one argument, namely the SUPER_CLASS_ID which
@@ -122,18 +124,49 @@ FEModel* FECoreBase::GetFEModel() const { return m_fem; }
 void FECoreBase::SetFEModel(FEModel* fem) { m_fem = fem; }
 
 //-----------------------------------------------------------------------------
-void setParamValue(FEParam& pi, const std::string& val)
+// Set a parameter from its string form, as stored in a class descriptor (this
+// is how febio.xml settings such as <default_linear_solver> are applied).
+//
+// Returns 1 on success, 0 if the value is not valid for the parameter, and -1
+// if this parameter type cannot be set this way.
+//
+// This used to handle only int, bool and double, and silently skipped every
+// other type (the assert is compiled out in release builds). std::string
+// parameters, e.g. the Accelerate solver's "strategy" and "iterative_method",
+// were therefore ignored when given in febio.xml, so a config asking for an
+// iterative solve quietly ran a direct one. Enum ints were read with atoi(),
+// so a symbolic value like "metis" became 0. Both now follow the .feb reader
+// (fexml::readParameter).
+static int setParamValue(FEParam& pi, const std::string& val)
 {
-	if (val.empty()) return;
+	if (val.empty()) return 1;
 	const char* sz = val.c_str();
 	switch (pi.type())
 	{
-	case FE_PARAM_INT: pi.value<int>() = atoi(sz); break;
+	case FE_PARAM_INT:
+	{
+		const char* szenum = pi.enums();
+		if ((szenum == nullptr) || (strncmp(szenum, "@factory_list", 13) == 0))
+		{
+			pi.value<int>() = atoi(sz);
+		}
+		else
+		{
+			// accept the enum name, or a plain number
+			int n = fexml::enumValue(sz, szenum);
+			if (n != -1) pi.value<int>() = n;
+			else if (fexml::is_number(sz)) pi.value<int>() = atoi(sz);
+			else return 0;
+		}
+	}
+	break;
 	case FE_PARAM_BOOL: pi.value<bool>() = (atoi(sz) == 0 ? false : true); break;
 	case FE_PARAM_DOUBLE: pi.value<double>() = atof(sz); break;
+	case FE_PARAM_STD_STRING: pi.value<std::string>() = val; break;
 	default:
-		assert(false);
+		return -1;
 	}
+	return 1;
 }
 
 //-----------------------------------------------------------------------------
@@ -163,7 +196,16 @@ bool FECoreBase::SetParameters(const FEClassDescriptor::ClassVariable& cv)
 			if (vi == nullptr) return false;
 
 			// set the value
-			setParamValue(*pi, vi->m_val);
+			int nret = setParamValue(*pi, vi->m_val);
+			if (nret == 0)
+			{
+				feLogError("Invalid value \"%s\" for parameter \"%s\" of \"%s\".", vi->m_val.c_str(), vari->m_name.c_str(), GetTypeStr());
+				return false;
+			}
+			else if (nret < 0)
+			{
+				feLogWarning("Parameter \"%s\" of \"%s\" cannot be set here and was ignored.", vari->m_name.c_str(), GetTypeStr());
+			}
 		}
 		else
 		{
