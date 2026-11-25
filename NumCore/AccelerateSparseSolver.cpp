@@ -905,8 +905,8 @@ bool AccelerateSparseSolver::FactorNow()
         if (imp->m_cholAuto && ((imp->ASF.status == SparseFactorizationFailed) ||
                                 (imp->ASF.status == SparseMatrixIsSingular)))
         {
-            accelLog(1, "Accelerate solver: Cholesky factorization failed (matrix is not positive definite).\n"
-                        "Switching to LDLT (threshold partial pivoting) for the rest of this run.");
+            feLogWarning("Accelerate solver: Cholesky factorization failed (matrix is not positive definite).\n"
+                         "Switching to LDLT (threshold partial pivoting) for the rest of this run.");
 
             SparseCleanup(imp->ASF);   // safe on a failed factorization; frees its storage
             SparseCleanup(imp->ASS);
@@ -916,7 +916,7 @@ bool AccelerateSparseSolver::FactorNow()
 
             imp->ASS = SparseFactor(SparseFactorizationLDLTTPP, imp->SMS, imp->SSFO);
             if (imp->ASS.status != SparseStatusOK) {
-                accelLog(2, "Accelerate solver: symbolic factorization failed (status = %d).", (int)imp->ASS.status);
+                feLogError("Accelerate solver: symbolic factorization failed (status = %d).", (int)imp->ASS.status);
                 return false;
             }
             imp->m_isSymbolic = true;
