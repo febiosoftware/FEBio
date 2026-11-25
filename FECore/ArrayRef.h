@@ -18,6 +18,8 @@ namespace fecore {
 		T* data() const { return m_data; }
 
 		size_t size() const { return m_size; }
+
+		bool empty() const { return  m_size == 0; }
 		
 		MemorySpace space() const { return m_space; }
 
