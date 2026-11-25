@@ -136,6 +136,9 @@ public:
 	// initialize the solver
 	bool InitSolver();
 
+	// called after analysis step completes to give solver opportunity to clean up.
+	bool FinishSolver();
+
 	// Call the FE Solver to solve the time step
 	// Returns an error code
 	// 0 = all is well, continue

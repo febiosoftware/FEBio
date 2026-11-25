@@ -384,6 +384,15 @@ bool FEAnalysis::InitSolver()
 	return true;
 }
 
+bool FEAnalysis::FinishSolver()
+{
+	FESolver* psolver = GetFESolver();
+	if (psolver == nullptr) return false;
+
+	return psolver->Finish();
+}
+
+
 //-----------------------------------------------------------------------------
 bool FEAnalysis::Solve()
 {
@@ -439,7 +448,11 @@ bool FEAnalysis::Solve()
 
 		// Inform that the time is about to change. (Plugins can use 
 		// this callback to modify time step)
-		if (fem.DoCallback(CB_UPDATE_TIME) == false) return false;
+		if (fem.DoCallback(CB_UPDATE_TIME) == false)
+		{
+			bconv = false;
+			break;
+		}
 
 		// update time
 		FETimeInfo& tp = fem.GetTime();
@@ -544,6 +557,9 @@ bool FEAnalysis::Solve()
 
 	// TODO: Why is this here?
 	fem.SetStartTime(fem.GetCurrentTime());
+
+	// finish the solver
+	if (!FinishSolver()) return false;
 
 	return bconv;
 }

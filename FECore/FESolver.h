@@ -142,6 +142,9 @@ public:
 	//! Calculates concentrated nodal loads
 //	virtual void NodalLoads(FEGlobalVector& R, const FETimeInfo& tp);
 
+	//! Called at completion of analysis step. Returning false will cause FEBio to error terminate.
+	virtual bool Finish() { return true; }
+
 public:
 	//! Set the equation allocation scheme
 	void SetEquationScheme(int scheme);
