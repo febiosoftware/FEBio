@@ -4245,7 +4245,6 @@ FEBeam3G2::FEBeam3G2() : FEBeam3_(NINT, FE_BEAM3G2)
 void FEBeam3G2::project_to_nodes(double* ai, double* ao) const
 {
 	// TODO: implement this better
-	assert(false);
 	ao[0] = ai[0];
 	ao[1] = ai[1];
 	ao[2] = 0.5*(ai[0] + ai[1]);
