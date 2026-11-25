@@ -164,6 +164,16 @@ public:
     int     m_fscaling;      // Accelerate's own scaling during numeric factorization
     double  m_pivotTol;      // pivot tolerance for threshold partial pivoting, [0, 0.5]
 
+    // Cholesky-first for symmetric matrices with factorization = "default".
+    // m_cholAuto: the current symbolic factorization is the automatic Cholesky
+    //             attempt (so a numeric failure may fall back to LDLT).
+    // m_cholFailed: Cholesky has failed once in this run; use LDLT from now
+    //             on. Deliberately NOT reset by Destroy(), so that a run whose
+    //             tangent has become indefinite does not keep paying for a
+    //             doomed Cholesky attempt after every PreProcess().
+    bool    m_cholAuto;
+    bool    m_cholFailed;
+
 public:
     //! Resolved solve strategy. The legacy boolean "iterative" parameter is
     //! folded in here so that old input files keep working.
@@ -198,6 +208,8 @@ public:
         m_pcMaxAge    = 0;
         m_pcAge       = 0;
         m_pcRefactor  = false;
+        m_cholAuto    = false;
+        m_cholFailed  = false;
         m_n = m_nnz = m_nrhs = 0;
         colS = nullptr;
     }
@@ -742,6 +754,18 @@ bool AccelerateSparseSolver::PreProcess()
                 return false;
             }
 
+            // Symmetric + "default": try Cholesky first. Accelerate's Cholesky
+            // is far faster than its LDLT with identical fill (202k-equation
+            // hex8 block, METIS: Cholesky 2.1 s, LDLT TPP 16.5 s). Solid
+            // tangents are usually positive definite; when one is not (e.g.
+            // near an instability), FactorNow() falls back to LDLT TPP.
+            // An explicitly requested factorization is always honored.
+            imp->m_cholAuto = false;
+            if (bsymm && (imp->m_ftype == FTSparseFactorizationDefault) && !imp->m_cholFailed) {
+                ftype = SparseFactorizationCholesky;
+                imp->m_cholAuto = true;
+            }
+
             // COLAMD computes an ordering for A^T A. That is exactly what the
             // QR-based factorizations want, and it is rejected by everything
             // else: by the symmetric factorizations (documented) and by LU,
@@ -758,12 +782,29 @@ bool AccelerateSparseSolver::PreProcess()
 
             switch (imp->m_ordmthd) {
                 case OMSparseOrderDefault:
-                    // Let Accelerate choose. It knows what suits the resolved
-                    // factorization type, and hard-coding a guess here is what
-                    // produced the COLAMD/LU mismatch in the first place. (The
-                    // header's claim that SparseOrderDefault means "COLAMD for
-                    // unsymmetric factorizations" predates LU.)
-                    imp->SSFO.orderMethod = SparseOrderDefault;
+                    // Symmetric factorizations: use METIS nested dissection.
+                    // Accelerate's own default for these is AMD, which on 3D
+                    // solid meshes produces far more fill. Measured on a hex8
+                    // block (3 dof/node, LDLT TPP):
+                    //     26k eqs:  AMD 1.8 s / 225 MB   METIS 0.55 s / 139 MB
+                    //    390k eqs:  AMD 430 s / 13 GB    METIS 67 s / 5.8 GB
+                    //    3.06M eqs: AMD 227 GB factor    METIS 98 GB factor
+                    // METIS's ordering step costs ~2-3x AMD's, but that is
+                    // seconds at most and is only paid in PreProcess(), not on
+                    // every refactorization. On tiny systems both are ~ms.
+                    //
+                    // LU: also use serial METIS. Accelerate's LU default is
+                    // MT-METIS, whose orderings are noticeably worse. Same mesh,
+                    // LU, Accelerate default vs METIS:
+                    //     86k eqs:  3.0 s / 1.75 GB   vs  0.91 s / 1.18 GB
+                    //    202k eqs: 10.9 s / 5.2 GB    vs  5.1 s / 3.9 GB
+                    //    3.06M eqs: 262 GB factor     vs  169 GB factor
+                    // and the symbolic step was no slower at any size tested.
+                    //
+                    // QR-based factorizations: let Accelerate choose (COLAMD).
+                    // COLAMD orders A^T A without forming it; AMD/METIS would
+                    // have to form A^T A explicitly.
+                    imp->SSFO.orderMethod = bQRbased ? SparseOrderDefault : SparseOrderMetis;
                     break;
 
                 case OMSparseOrderAMD:
@@ -908,6 +949,33 @@ bool AccelerateSparseSolver::FactorNow()
         }
 
         imp->ASF = SparseFactor(imp->ASS, imp->A, imp->SNFO);
+
+        // Automatic Cholesky failed: the matrix is not (numerically) positive
+        // definite. Redo the symbolic analysis for LDLT TPP with the same
+        // ordering options and factor again. Only a numeric failure triggers
+        // this; parameter or allocation errors are reported as usual.
+        if (imp->m_cholAuto && ((imp->ASF.status == SparseFactorizationFailed) ||
+                                (imp->ASF.status == SparseMatrixIsSingular)))
+        {
+            accelLog(1, "Accelerate solver: Cholesky factorization failed (matrix is not positive definite).\n"
+                        "Switching to LDLT (threshold partial pivoting) for the rest of this run.");
+
+            SparseCleanup(imp->ASF);   // safe on a failed factorization; frees its storage
+            SparseCleanup(imp->ASS);
+            imp->m_isSymbolic = false;
+            imp->m_cholAuto   = false;
+            imp->m_cholFailed = true;
+
+            imp->ASS = SparseFactor(SparseFactorizationLDLTTPP, imp->SMS, imp->SSFO);
+            if (imp->ASS.status != SparseStatusOK) {
+                accelLog(2, "Accelerate solver: symbolic factorization failed (status = %d).", (int)imp->ASS.status);
+                return false;
+            }
+            imp->m_isSymbolic = true;
+
+            imp->ASF = SparseFactor(imp->ASS, imp->A, imp->SNFO);
+        }
+
         if (imp->ASF.status != SparseStatusOK) {
             const char* szerr = "unknown error";
             switch (imp->ASF.status) {
